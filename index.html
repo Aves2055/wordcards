@@ -1,486 +1,177 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#2f5d50">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#0f1b33">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<title>My Word Cards</title>
+<link rel="apple-touch-icon" href="icon-192.png"><title>My Word Cards</title>
 <style>
-:root{color-scheme:light dark;--accb:color-mix(in srgb,var(--acc) 13%,var(--card));--bg:#f4f2ec;--card:#fff;--ink:#1d1d1b;--mute:#6b6a64;--line:#e3dfd5;--acc:#2f5d50;--on:#fff;--ok:#1f7a4d;--okb:#dff3e8;--bad:#b3402a;--badb:#fbe5df;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--card:#201e1b;--ink:#efece4;--mute:#a39f93;--line:#35322c;--acc:#8fc4b2;--on:#10201a;--ok:#7fd1a3;--okb:#1d3a2b;--bad:#f0a08c;--badb:#3d2420}}
-:root[data-theme="dark"]{--bg:#141413;--card:#201e1b;--ink:#efece4;--mute:#a39f93;--line:#35322c;--acc:#8fc4b2;--on:#10201a;--ok:#7fd1a3;--okb:#1d3a2b;--bad:#f0a08c;--badb:#3d2420}
-*{box-sizing:border-box}html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI","Noto Sans","Noto Sans Devanagari","Noto Sans Telugu","Noto Naskh Arabic",sans-serif}
-.wrap{max-width:780px;margin:0 auto;padding:14px 14px 96px}
-header{display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 14px}
-h1{font-size:22px;margin:0;letter-spacing:-.01em}
-#status{font-size:12px;color:var(--mute)}
-button,input,textarea{font:inherit;color:inherit}
-button{border:1px solid var(--line);background:var(--card);padding:10px 14px;border-radius:12px;cursor:pointer}
-button:active{transform:scale(.98)}
-button.pri{background:var(--acc);color:var(--on);border-color:var(--acc);font-weight:600}
-button.sm{padding:6px 10px;font-size:13px;border-radius:10px}
-input,textarea{width:100%;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px}
-textarea{min-height:80px;resize:vertical}
-input:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
-label{display:block;font-size:12px;color:var(--mute);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.05em}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-.head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;padding-bottom:10px;margin-bottom:12px;border-bottom:2px solid var(--accb)}
-.word{font-size:28px;font-weight:750;line-height:1.1;color:var(--acc)}
-.sub{color:var(--mute);font-size:14px;margin-top:4px}
-.main{font-size:16px;margin-bottom:12px}
-.h3{margin:14px 0 6px;font-size:12px;color:var(--acc);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
-.fam{border-left:4px solid var(--acc);background:var(--accb);border-radius:4px 12px 12px 4px;padding:8px 12px;margin-bottom:8px}
-.fh{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
-.fh b{font-size:17px}
-.tag{font-size:11px;background:var(--acc);color:var(--on);border-radius:20px;padding:1px 8px}
-.pr{color:var(--mute);font-size:13px}
-.ex{color:var(--mute);font-style:italic;font-size:14px;margin-top:2px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media (max-width:560px){.grid{grid-template-columns:1fr}}
-.sec{background:var(--accb);border-radius:12px;padding:10px 12px}
-.sec .h3{margin:0 0 4px}.sec div{white-space:pre-wrap;font-size:15px}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.row>*{flex:1}
-.mute{color:var(--mute);font-size:14px}
-.bar{display:flex;gap:8px;align-items:center;margin-bottom:12px}.bar button{white-space:nowrap}
-.hide{display:none}
-.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
-.tabs button{flex:1;border:0;background:none;padding:6px 2px;font-size:11px;color:var(--mute);border-radius:10px}
-.tabs button span{display:block;font-size:20px;line-height:1.2}
-.tabs button.on{color:var(--acc);background:var(--accb);font-weight:700}
-.opt{display:block;width:100%;text-align:left;margin-top:8px;padding:12px}
-.opt.ok{background:var(--okb);border-color:var(--ok)}.opt.bad{background:var(--badb);border-color:var(--bad)}
-.q{font-size:19px;margin:6px 0 8px}
-.pill{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:5px 14px;margin-right:6px;cursor:pointer}
-.pill.on{background:var(--acc);color:var(--on);border-color:var(--acc)}
-.frow{border:1px dashed var(--line);border-radius:12px;padding:8px;margin-top:8px}
-.frow input{margin-bottom:6px}
-.big{font-size:42px;font-weight:800;color:var(--acc)}
-.spk{border:0;background:none;padding:2px 6px;font-size:16px;cursor:pointer;vertical-align:middle}
-.rm{color:var(--acc);font-size:13px;font-weight:600}
-:root[data-theme="light"]{color-scheme:light}:root[data-theme="dark"]{color-scheme:dark}
-.pill{margin-bottom:6px}
-.chip.ok{background:var(--okb);border-color:var(--ok)}.chip.bad{background:var(--badb);border-color:var(--bad)}.chip small{opacity:.7}
-.wrapc{flex-wrap:wrap;overflow:visible;padding-top:2px}.def{padding:6px 0}.tabs button{min-width:0}
-.sw{display:inline-block;width:34px;height:34px;border-radius:50%;margin:0 8px 6px 0;border:3px solid transparent;cursor:pointer}.sw.on{border-color:var(--ink)}
-.tagc{display:inline-block;font-size:12px;color:var(--acc);background:var(--accb);border-radius:20px;padding:1px 8px;margin:0 6px 4px 0}.tgs{margin-bottom:6px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
-.stats div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 2px;text-align:center;font-size:11px;color:var(--mute)}
-.stats b{display:block;font-size:20px;color:var(--acc);line-height:1.2}
-.bar2{height:8px;background:var(--accb);border-radius:8px;overflow:hidden;margin:-2px 0 14px}.bar2 i{display:block;height:100%;background:var(--acc)}
-.item{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:8px}.item.open{border-color:var(--acc)}
-.irow{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;padding:12px 14px;cursor:pointer}
-.iw{flex:1;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px}.iw b{font-size:18px}
-.chev{color:var(--mute);transition:transform .15s}.item.open .chev{transform:rotate(180deg)}
-.im{width:100%;color:var(--mute);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ibody{padding:0 14px 14px}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:12px 0 10px;scrollbar-width:none}
-.chip{white-space:nowrap;border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;background:var(--card)}
-.chip.on{background:var(--acc);color:var(--on);border-color:var(--acc)}
-.tr{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.tr:last-child{border:0}
-.lang{min-width:90px;color:var(--acc);font-weight:600;font-size:13px}
-.txt{white-space:pre-wrap}
-.exs{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.exs:last-child{border:0}
-</style></head>
-<body><div class="wrap">
-<header><h1>📚 My Word Cards</h1><span><span id="status"></span> <button class="spk" data-t="set" title="Settings">⚙️</button></span></header>
-<div id="v-today"></div><div id="v-words" class="hide"></div><div id="v-dict" class="hide"></div><div id="v-quiz" class="hide"></div><div id="v-paste" class="hide"></div><div id="v-new" class="hide"></div><div id="v-set" class="hide"></div>
-</div>
-<div class="tabs" id="tabs"></div>
-<input type="file" id="imp" accept="application/json,.json" class="hide">
+:root{--bg:#f4f6fb;--card:#fff;--ink:#0f1b33;--mute:#667088;--line:#e1e6f0;--acc:#3b64e8;--accb:#e8eefc;--on:#fff;--ok:#1d7a4f;--okb:#e0f4ea;--bad:#b3392a;--badb:#fbe6e2;--nav:#0f1b33}
+[data-t=d]{--bg:#0c1220;--card:#151d30;--ink:#e8ecf6;--mute:#9aa5bd;--line:#26314b;--acc:#8aa8ff;--accb:#1c2742;--on:#0c1220;--ok:#7fd1a3;--okb:#17352a;--bad:#f0a08c;--badb:#3a2220;--nav:#0a0f1c}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI","Noto Sans","Noto Sans Devanagari","Noto Sans Telugu",sans-serif;padding-top:env(safe-area-inset-top,0px)}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}.app.mini{grid-template-columns:62px 1fr}
+aside{background:var(--nav);color:#dbe3f7;padding:14px 10px;position:sticky;top:0;height:100vh}aside h1{font-size:17px;margin:4px 8px 16px;color:#fff}.mini aside h1 span,.mini aside .nb span{display:none}
+.nb{display:flex;gap:10px;align-items:center;width:100%;border:0;background:none;color:inherit;padding:11px 12px;border-radius:12px;cursor:pointer;font-size:15px;text-align:left}.nb:hover{background:#ffffff14}.nb.on{background:var(--acc);color:var(--on);font-weight:600}
+main{padding:20px 22px 40px;max-width:900px;width:100%;margin:0 auto}
+button,input,textarea{font:inherit;color:inherit}button{border:1px solid var(--line);background:var(--card);padding:9px 14px;border-radius:11px;cursor:pointer}button.pri{background:var(--acc);color:var(--on);border-color:var(--acc);font-weight:600}button.sm{padding:5px 10px;font-size:13px;border-radius:9px}
+input,textarea{width:100%;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px}input:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}textarea{min-height:100px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px #0000000a}h2{margin:0 0 10px;font-size:22px}h3{margin:16px 0 6px;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--acc)}
+.mute{color:var(--mute);font-size:14px}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.grow{flex:1}.hide{display:none}
+.big{font-size:32px;font-weight:800;letter-spacing:-.02em}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}.st{background:var(--accb);border-radius:14px;padding:12px;text-align:center;font-size:12px;color:var(--mute)}.st b{display:block;font-size:24px;color:var(--acc)}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:5px 13px;margin:0 6px 6px 0;cursor:pointer;font-size:14px;background:var(--card)}.pill.on{background:var(--acc);color:var(--on);border-color:var(--acc)}.pill.ok{background:var(--okb);border-color:var(--ok)}.pill.bad{background:var(--badb);border-color:var(--bad)}
+.tg{font-size:11px;border-radius:20px;padding:1px 8px;background:var(--accb);color:var(--acc);margin-left:6px}.tg.ok{background:var(--okb);color:var(--ok)}.tg.bad{background:var(--badb);color:var(--bad)}
+.def{padding:7px 0;border-bottom:1px solid var(--line)}.def:last-child{border:0}.ex{color:var(--mute);font-style:italic;font-size:14px}.trl{color:var(--acc);font-size:14px}
+.rel{border:1px solid var(--line);border-radius:12px;margin:6px 0}.rh{display:flex;gap:6px;align-items:center;padding:9px 12px;cursor:pointer}.rb{padding:0 12px 10px}
+details{border:1px solid var(--line);border-radius:12px;margin:6px 0;padding:8px 12px}summary{cursor:pointer;font-weight:600}mark{background:var(--accb);color:var(--acc);padding:0 3px;border-radius:4px;font-weight:700}
+.spk{border:0;background:none;padding:2px 6px;cursor:pointer;font-size:17px}.bn{display:none}#toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:20px;font-size:14px;opacity:0;transition:.2s;pointer-events:none;z-index:9}#toast.on{opacity:1}
+.opt{display:block;width:100%;text-align:left;margin-top:8px;padding:12px}.opt.ok{background:var(--okb);border-color:var(--ok)}.opt.bad{background:var(--badb);border-color:var(--bad)}.bar{height:8px;background:var(--accb);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
+@media(max-width:800px){.app{display:block}aside{display:none}main{padding:14px 14px 96px}.bn{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}.bn button{flex:1;border:0;background:none;font-size:11px;color:var(--mute);padding:4px 0}.bn button span{display:block;font-size:20px}.bn button.on{color:var(--acc);font-weight:700}}
+@media print{aside,.bn,.row button{display:none}}
+</style></head><body><div class="app" id="app"><aside id="sb"></aside><main id="main"></main></div><nav class="bn" id="bn"></nav><div id="toast"></div>
 <script>
-const TABS=[["today","☀️","Today"],["words","📖","Words"],["dict","🔍","Dict"],["quiz","🎯","Quiz"],["paste","📋","Paste"],["new","➕","New"]];
-const TPL=`Egoist
-Pronunciation: /ˈiː.ɡoʊ.ɪst/
-Say it: EE-go-ist
-Root: Latin ego = I
-Tags: personality, behaviour
-Synonyms: selfish, self-centred
-Antonyms: altruist, selfless
-Meaning: A person who puts their own interests above everyone else's.
-Grammar family:
-Egoist (noun) /ˈiː.ɡoʊ.ɪst/ [EE-go-ist] – a person who acts only in their own interest. Example: An egoist rarely thinks of how his choices hurt others.
-Egoism (noun) /ˈiː.ɡoʊ.ɪ.zəm/ [EE-go-iz-um] – the habit or belief of putting oneself first. Example: His egoism ruined the team.
-Egoistic (adjective) /ˌiː.ɡoʊˈɪs.tɪk/ [ee-go-IS-tik] – driven only by self-interest. Example: Her egoistic attitude lost her many friends.
-Egotist (noun) /ˈiː.ɡə.tɪst/ [EE-go-tist] – a boastful person who talks about themselves constantly. Example: The egotist dominated every conversation.
-Egomaniac (noun) /ˌiː.ɡoʊˈmeɪ.ni.æk/ [ee-go-MAY-nee-ak] – a person obsessed with themselves and their own importance. Example: The director was a known egomaniac.
-Egomaniacal (adjective) /ˌiː.ɡoʊ.məˈnaɪ.ə.kəl/ [ee-go-muh-NY-uh-kul] – extremely self-obsessed. Example: His egomaniacal speech bored everyone.
-Translations:
-Hindi: स्वार्थी व्यक्ति
-Urdu: خود غرض
-Roman Urdu: Khud gharaz
-Telugu: స్వార్థపరుడు
-Context & usage:
-Everyday: critical. Philosophy: neutral (ethical egoism).
-Don't confuse with:
-Egotist (with a t, for talk) boasts; an egoist simply puts self first.
-Sentences:
-An egoist rarely thinks of how his choices hurt others.`;
-const SECS=[["translations","Translations"],["context","Context & usage"],["confuse","Don’t confuse with"],["sentences","Example sentences"]];
-const DAY=864e5,STEPS=[0,1,2,4,8,16,32],LS="wc2";
-let words=[],store=null,tab="today",flip=false,q="",draft=null,editing=null,ptxt="",Q=null,qn=10,note="",pword="",cpnote="",OPEN=new Set(),SUB={},sort="az",prac=null,ftag="",qmode="choice",qscope="all";
-const $=id=>document.getElementById(id);
-const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const live=()=>words.filter(w=>!w.deleted);
-const nid=()=>"w"+Date.now()+Math.random().toString(36).slice(2,5);
+const $=id=>document.getElementById(id),esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LS=k=>{try{return localStorage.getItem(k)}catch(e){return null}},SV=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},JD=(k,d)=>{try{return JSON.parse(LS(k))||d}catch(e){return d}};
+const DAY=864e5,STEPS=[0,1,2,4,8,16,32],csv=s=>String(s||"").split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean),cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-function save(){try{localStorage.setItem(LS,JSON.stringify(words))}catch(e){}}
-function load(){try{words=JSON.parse(localStorage.getItem(LS)||"[]")}catch(e){words=[]}}
-function setStatus(){$("status").textContent=store?"Synced · works offline":"Saved on this device · works offline"}
-function fixNames(){let ch=false;words.forEach(w=>{if(!w.deleted&&/^[\[\(<\s]*word[\]\)>\s]*$/i.test(w.word||"")){const f=(w.family||[]).find(x=>x.w);if(f){w.word=f.w;w.u=Date.now();ch=true;if(store)store.doc(w.id).set(w).catch(()=>{})}}});if(ch)save()}
-function mergeIn(list){
-  const m=new Map(words.map(w=>[w.id,w])),rm=new Map(list.map(w=>[w.id,w]));
-  list.forEach(r=>{const l=m.get(r.id);if(!l||(r.u||0)>(l.u||0))m.set(r.id,r)});
-  words=[...m.values()];fixNames();save();
-  if(store)words.forEach(l=>{const r=rm.get(l.id);if(!r||(l.u||0)>(r.u||0))store.doc(l.id).set(l).catch(()=>{})});
-}
-async function put(w){
-  w.u=Date.now();const i=words.findIndex(x=>x.id===w.id);if(i>=0)words[i]=w;else words.push(w);
-  save();if(store)store.doc(w.id).set(w).catch(()=>{});render();
-}
-const del=id=>put({id,deleted:true});
-async function init(){
-  loadCfg();applyCfg();try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",applyCfg)}catch(e){}
-  load();fixNames();setStatus();render();
-  if(typeof claude==="undefined")return;
-  try{
-    const user=await claude.use("user"),db=await claude.use("db");
-    if(user&&db){const uid=await user.id();store=db.collection("data/users/"+uid);setStatus();
-      store.onSnapshot(s=>{mergeIn(s.docs.map(d=>d.data()).filter(Boolean));render()},()=>{store=null;setStatus()});}
-  }catch(e){}
-}
-/* ---------- paste parser ---------- */
-const HEAD=/^(tags?|synonyms?|antonyms?|word|heading|title|roman pronunciation|say it|sounds like|pronunciation|root|origin|etymology|grammar family|grammar|word family|family|translations?|meanings?|definitions?|context\s*(?:&|and)?\s*usage|context|usage|don['’]?t confuse(?: with)?|nuance|contextual sentences|example sentences|sentences|examples?)\b\s*[:\-–—]?\s*(.*)$/i;
-function keyOf(h){h=h.toLowerCase();
-  if(/^tag/.test(h))return"tags";if(/^syn/.test(h))return"syn";if(/^ant/.test(h))return"ant";if(/^(word|heading|title)/.test(h))return"word";if(/^(roman pron|say it|sounds)/.test(h))return"roman";if(/^pron/.test(h))return"pron";if(/^(root|origin|etym)/.test(h))return"root";
-  if(/^(grammar|word family|family)/.test(h))return"family";if(/^transl/.test(h))return"translations";if(/^(mean|defin)/.test(h))return"meaning";
-  if(/^(context|usage)/.test(h))return"context";if(/^(don|nuance)/.test(h))return"confuse";return"sentences"}
-function famLine(s){
-  s=s.replace(/^[\s•\-\*·]+/,"").replace(/^\d+[\.\)]\s+/,"").trim();if(!s)return null;
-  let ex="",pron="",roman="",pos="",mean="",w="",m=s.match(/\b(?:example|e\.g\.|eg)\s*[:\-–]\s*(.+)$/i);
-  if(m){ex=m[1].replace(/^["“]|["”]$/g,"").trim();s=s.slice(0,m.index).trim()}
-  m=s.match(/\/[^\/]{2,}\//);if(m){pron=m[0];s=s.replace(m[0]," ")}m=s.match(/\[([^\]]{2,})\]/);if(m){roman=m[1].replace(/^\s*(say|says|sounds like|roman)\s*[:\-–]?\s*/i,"").trim();s=s.replace(m[0]," ")}
-  m=s.match(/^(noun|verb|adjective|adverb|adj|adv|preposition)\b[^:]*:\s*(.+)$/i);if(m){pos=m[1].toLowerCase();s=m[2]}
-  m=s.match(/^([^:–—(]+?)\s*(?:\(([^)]*)\))?\s*(?:[:–—]|\s-\s)\s*(.+)$/);
-  if(m){w=m[1];if(m[2]&&!pos)pos=m[2];mean=m[3]}
-  else{m=s.match(/^([^(]+?)\s*(?:\(([^)]*)\))?\s*$/);if(m){w=m[1];if(m[2]){if(pos)mean=m[2];else pos=m[2]}}}
-  mean=mean.replace(/^meaning\s*[:\-–]\s*/i,"").replace(/\s+$/,"");
-  return{w:w.trim(),pos:pos.trim(),pron,roman,meaning:mean.trim(),ex}
-}
-function parse(t){
-  const buf={},push=(k,v)=>(buf[k]=buf[k]||[]).push(v);let cur=null,word="";
-  t.replace(/[│┌┐└┘─═╔╗╚╝║┬┴├┤┼]/g," ").split(/\r?\n/).forEach(raw=>{
-    const s=raw.replace(/^\s*\[\s*([^\]:]+?)\s*\]\s*:/,"$1:").trim();if(!s)return;
-    const m=HEAD.exec(s.replace(/^\d+[\.\)]\s+/,""));
-    if(m){cur=keyOf(m[1]);if(m[2].trim())push(cur,m[2].trim())}else if(cur)push(cur,s);else if(!word)word=s;
-  });
-  const j=(k,sep)=>(buf[k]||[]).join(sep||"\n");
-  let w=word||(buf.word||[])[0]||"";if(w===w.toUpperCase())w=w.charAt(0)+w.slice(1).toLowerCase();
-  const fam=(buf.family||[]).map(famLine).filter(f=>f&&f.w);w=w.replace(/^[\[\(<\s]+|[\]\)>\s]+$/g,"");if(!w||/^word$/i.test(w))w=fam.length?fam[0].w:w;let pr=j("pron"," "),rm=j("roman"," ");if(!rm){const mm=pr.match(/\(([^)]+)\)\s*$/);if(mm){rm=mm[1];pr=pr.replace(mm[0],"").trim()}}
-  return{word:w.trim(),pron:pr,roman:rm,tags:j("tags",", "),syn:j("syn",", "),ant:j("ant",", "),root:j("root"," "),meaning:j("meaning"),translations:j("translations"),context:j("context"),confuse:j("confuse"),sentences:j("sentences"),family:fam}
-}
-/* ---------- card ---------- */
-function famRow(f){return`<div class="fam"><div class="fh"><b>${esc(f.w)}</b><button class="spk" data-say="${esc(f.w)}" title="Listen">🔊</button>${f.pos?`<span class="tag">${esc(f.pos)}</span>`:""}${f.roman?`<span class="rm">${esc(f.roman)}</span>`:""}${f.pron?`<span class="pr">${esc(f.pron)}</span>`:""}</div>${f.meaning?`<div>${esc(f.meaning)}</div>`:""}${f.ex?`<div class="ex">“${esc(f.ex)}”</div>`:""}</div>`}
-function detail(w,id){
-  const fam=(w.family||[]).filter(f=>f.w),T=[];
-  if(fam.length||w.grammar)T.push(["family","Family"+(fam.length?" ("+fam.length+")":"")]);
-  if(w.translations)T.push(["tr","Translations"]);
-  if(w.context)T.push(["ctx","Context & usage"]);
-  if(w.confuse)T.push(["cf","Don’t confuse with"]);
-  if(w.sentences)T.push(["ex","Example sentences"]);
-  if(fam.length>=2||csv(w.syn).length||csv(w.ant).length)T.push(["map","Root map"]);
-  if(csv(w.syn).length||csv(w.ant).length)T.push(["sa","Synonyms & antonyms"]);
-  const cur=T.some(t=>t[0]===SUB[id])?SUB[id]:(T[0]||[])[0];let p="";
-  if(cur==="family")p=fam.length?fam.map(famRow).join(""):`<div class="txt">${esc(w.grammar)}</div>`;
-  else if(cur==="tr")p=w.translations.split("\n").filter(l=>l.trim()).map(l=>{const m=l.match(/^\s*([^:]{1,24}):\s*(.+)$/);return m?`<div class="tr"><span class="lang">${esc(m[1])}</span><span>${esc(m[2])}</span></div>`:`<div class="tr"><span>${esc(l)}</span></div>`}).join("");
-  else if(cur==="ctx")p=`<div class="txt">${esc(w.context)}</div>`;
-  else if(cur==="cf")p=`<div class="txt">${esc(w.confuse)}</div>`;
-  else if(cur==="ex")p=w.sentences.split("\n").map(l=>l.replace(/^[\s•\-\*\d\.\)]+/,"").trim()).filter(Boolean).map(l=>`<div class="exs"><span>“${esc(l)}”</span><button class="spk" data-say="${esc(l)}" title="Listen">🔊</button></div>`).join("");
-  if(cur==="map")p=diagram(rootLines(stemOf(w.word),w.root),groupsFromCard(w))+`<p class="mute">Tap a word in the map to look it up (needs internet).</p>`;
-  else if(cur==="sa")p=(csv(w.syn).length?`<div class="h3" style="margin-top:0">Synonyms</div><div class="chips wrapc">${csv(w.syn).map(x=>`<span class="chip ok" data-lk="${esc(x)}">${esc(x)}</span>`).join("")}</div>`:"")+(csv(w.ant).length?`<div class="h3">Antonyms</div><div class="chips wrapc">${csv(w.ant).map(x=>`<span class="chip bad" data-lk="${esc(x)}">${esc(x)}</span>`).join("")}</div>`:"");
-  const meta=[w.pron,w.root].filter(Boolean).map(esc).join(" · "),mean=w.meaning||w.meanings||"";
-  return(tagsOf(w).length?`<div class="tgs">${tagsOf(w).map(t=>`<span class="tagc">#${esc(t)}</span>`).join("")}</div>`:"")+(meta?`<div class="sub">${meta}</div>`:"")+(mean?`<div class="main" style="margin-top:8px">${esc(mean).replace(/\n/g,"<br>")}</div>`:"")+(T.length?`<div class="chips">${T.map(([k,l])=>`<span class="chip ${k===cur?"on":""}" data-sub="${esc(id)}|${k}">${esc(l)}</span>`).join("")}</div><div>${p}</div>`:"")
-}
-function full(w){return`<div class="card"><div class="head"><div><div class="word">${esc(w.word)} <button class="spk" data-say="${esc(w.word)}" title="Listen">🔊</button></div>${w.roman?`<div class="rm" style="margin-top:2px;font-size:15px">Say it: ${esc(w.roman)}</div>`:""}</div></div>${detail(w,w.id||"pv")}</div>`}
-function item(w){const o=OPEN.has(w.id),m=(w.meaning||w.meanings||"").split("\n")[0];
-  return`<div class="item ${o?"open":""}"><div class="irow" data-x="${w.id}"><div class="iw"><b>${esc(w.word)}</b>${(w.miss||0)>=2?"🔥":""}${w.roman?`<span class="rm">${esc(w.roman)}</span>`:""}</div><span class="chev">▾</span>${m?`<div class="im">${esc(m)}</div>`:""}</div>${o?`<div class="ibody">${detail(w,w.id)}<div class="row"><button class="sm" data-say="${esc(w.word)}">🔊 Listen</button><button class="sm" data-edit="${w.id}">✏️ Edit</button><button class="sm" data-del="${w.id}">🗑 Delete</button></div></div>`:""}</div>`}
-/* ---------- views ---------- */
-const CFG0={theme:"auto",accent:"green",fs:"1",goal:3,voice:"en-IN",rate:"0.85"};
-let cfg=Object.assign({},CFG0);
-const PAL={green:["#2f5d50","#8fc4b2"],blue:["#2f5f9e","#8db4e8"],purple:["#6a4aa3","#b9a2ea"],orange:["#b4571f","#f0a971"],rose:["#a8405a","#ec9bb0"]};
-const lget=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
-function loadCfg(){try{cfg=Object.assign({},CFG0,JSON.parse(lget("wc2c")||"{}"))}catch(e){}}
-function saveCfg(){try{localStorage.setItem("wc2c",JSON.stringify(cfg))}catch(e){}}
-function applyCfg(){const R=document.documentElement;
-  if(cfg.theme==="auto")R.removeAttribute("data-theme");else R.setAttribute("data-theme",cfg.theme);
-  let dark=cfg.theme==="dark";if(cfg.theme==="auto"){try{dark=matchMedia("(prefers-color-scheme: dark)").matches}catch(e){}}
-  const p=PAL[cfg.accent]||PAL.green;R.style.setProperty("--acc",dark?p[1]:p[0]);R.style.zoom=cfg.fs}
-const tagsOf=w=>String(w.tags||"").split(/[,#]+/).map(x=>x.trim().toLowerCase()).filter(Boolean);
-function tagPills(){const tags=[...new Set(live().flatMap(tagsOf))].sort(),hn=live().filter(w=>(w.miss||0)>=2).length;
-  return[["","All"],["*hard","🔥 Hard ("+hn+")"],...tags.map(t=>[t,"#"+t])].map(([k,l])=>`<span class="chip ${ftag===k?"on":""}" data-tag="${esc(k)}">${esc(l)}</span>`).join("")}
-function scoped(){return live().filter(w=>qscope==="hard"?(w.miss||0)>=2:qscope.startsWith("tag:")?tagsOf(w).includes(qscope.slice(4)):true)}
-function missIt(it){const w=words.find(x=>x.id===it.h);if(w){w.miss=(w.miss||0)+1;put(w)}}
-function okIt(it){const w=words.find(x=>x.id===it.h);if(w&&(w.miss||0)>0){w.miss--;put(w)}}
-function goalLine(){const t=new Date().toDateString(),g=+cfg.goal||0;if(!g)return"";
-  const a=live().filter(w=>{const ts=parseInt(String(w.id).slice(1));return ts&&new Date(ts).toDateString()===t}).length;
-  return`<div class="mute" style="margin:-4px 0 12px">🌱 New words today: <b>${a}/${g}</b>${a>=g?" ✅":""} ${a<g?`<button class="sm" data-t="paste" style="margin-left:6px">Add a word</button>`:""}</div>`}
-function backupBanner(){const n=live().length,lb=+lget("wc2b")||0;if(n<5||Date.now()-lb<7*DAY)return"";
-  return`<div class="card" style="padding:10px 14px">💾 Your last backup was ${lb?Math.floor((Date.now()-lb)/DAY)+" days ago":"never"}.<div class="row"><button class="sm pri" data-a="exp">Export now</button><button class="sm" data-a="snooze">Later</button></div></div>`}
-const pills=(key,opts)=>opts.map(([v,l])=>`<span class="pill ${String(cfg[key])===String(v)?"on":""}" data-cfg="${key}|${v}">${l}</span>`).join("");
-function vSet(){
-  const sw=Object.keys(PAL).map(k=>`<span class="sw ${cfg.accent===k?"on":""}" data-cfg="accent|${k}" style="background:${PAL[k][0]}" title="${k}"></span>`).join(""),lb=+lget("wc2b")||0;
-  return`<div class="card"><b>Appearance</b><label>Theme</label><div>${pills("theme",[["auto","Auto"],["light","Light"],["dark","Dark"]])}</div><label>Accent colour</label><div>${sw}</div><label>Text size</label><div>${pills("fs",[["0.9","Small"],["1","Normal"],["1.15","Large"],["1.3","Extra large"]])}</div></div>
-<div class="card"><b>Learning</b><label>New words per day (goal)</label><div class="bar"><button class="sm" data-a="gminus">−</button><b style="min-width:30px;text-align:center">${cfg.goal}</b><button class="sm" data-a="gplus">+</button><span class="mute">0 turns the goal off</span></div><label>Pronunciation accent</label><div>${pills("voice",[["en-IN","India"],["en-US","US"],["en-GB","UK"]])}</div><label>Speaking speed</label><div>${pills("rate",[["0.7","Slow"],["0.85","Normal"],["1","Fast"]])}</div><div class="row"><button class="sm" data-say="egoist">🔊 Test voice</button></div></div>
-<div class="card"><b>Your data</b><p class="mute">${live().length} cards saved on this device. Last backup: ${lb?new Date(lb).toLocaleDateString():"never"}.</p><div class="row"><button class="sm" data-a="exp">⬇ Export file</button><button class="sm" data-a="imp">⬆ Import file</button><button class="sm" data-a="cpbk">📋 Copy backup text</button></div><label>Restore: paste backup text here</label><textarea id="rb" placeholder="Paste backup text from your other device…"></textarea><div class="row"><button class="sm pri" data-a="rbk">Restore</button></div><div class="mute" style="margin-top:8px">${esc(note)}</div></div>`}
-const csv=s=>String(s||"").split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean);
-const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
-const POSN={n:"Noun",v:"Verb",adj:"Adjective",adv:"Adverb"};
-const posName=p=>{p=String(p||"").toLowerCase();return POSN[p]||(p?cap(p):"Other")};
-const ipa=t=>t?"/"+String(t).replace(/^\/|\/$/g,"")+"/":"";
-let LK=null,dq="",selFam=new Set();
-const recents=()=>{try{return JSON.parse(lget("wc2r")||"[]")}catch(e){return[]}};
-function addRecent(w){const r=[w,...recents().filter(x=>x!==w)].slice(0,12);try{localStorage.setItem("wc2r",JSON.stringify(r))}catch(e){}}
+let words=JD("wc2",[]),cfg=Object.assign({theme:"auto",lang:"en",voice:"en-IN",rate:"0.9"},JD("wc2c",{})),TC=JD("wc3t",{}),TP={},store=null,tab="home",sm="one",P=null,sq="",RO=new Set(),RC={},B=null,Q=null,lvl=0,qmode="all",fl="all",open=new Set(),note="";
+const live=()=>words.filter(w=>!w.deleted),nid=()=>"w"+Date.now()+Math.random().toString(36).slice(2,5),POSN={n:"noun",v:"verb",adj:"adjective",adv:"adverb"};
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(()=>e.classList.remove("on"),1600)}
+async function cp(t){let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){const a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();try{ok=document.execCommand("copy")}catch(x){}a.remove()}toast(ok?"Copied ✓":"Copy failed")}
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=cfg.voice;u.rate=+cfg.rate||.9;speechSynthesis.speak(u)}catch(e){toast("Voice not supported")}}
+function aud(u,w){try{const a=new Audio(u);a.onerror=()=>say(w);const p=a.play();p&&p.catch&&p.catch(()=>say(w))}catch(e){say(w)}}
+function theme(){const d=cfg.theme==="dark"||(cfg.theme==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.dataset.t=d?"d":"l"}
+/* data: same wc2 store as before; sync through db when available */
+const save=()=>SV("wc2",words);
+function mergeIn(list){const m=new Map(words.map(w=>[w.id,w])),rm=new Map(list.map(w=>[w.id,w]));list.forEach(r=>{const l=m.get(r.id);if(!l||(r.u||0)>(l.u||0))m.set(r.id,r)});words=[...m.values()];save();if(store)words.forEach(l=>{const r=rm.get(l.id);if(!r||(l.u||0)>(r.u||0))store.doc(l.id).set(l).catch(()=>{})})}
+function put(w){w.u=Date.now();const i=words.findIndex(x=>x.id===w.id);if(i>=0)words[i]=w;else words.push(w);save();if(store)store.doc(w.id).set(w).catch(()=>{});render()}
+function fixName(){let c=0;words.forEach(w=>{if(!w.deleted&&/^[\[\(<\s]*word[\]\)>\s]*$/i.test(w.word||"")){const f=(w.family||[]).find(x=>x.w);if(f){w.word=f.w;w.u=Date.now();c=1}}});if(c)save()}
+/* online sources */
+const jget=async u=>{const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json()},dm=q=>jget("https://api.datamuse.com/words?"+q);
 const SUF=["istically","ically","istic","ation","ition","ality","ness","ment","ical","ious","less","ful","ism","ist","ity","ous","ive","ize","ise","ing","est","ly","ed","er","ic","al","s","y"].sort((a,b)=>b.length-a.length);
-function stemOf(w){w=String(w).toLowerCase();for(const s of SUF)if(w.endsWith(s)&&w.length-s.length>=3)return w.slice(0,w.length-s.length);return w}
-async function jget(u){const r=await fetch(u);if(!r.ok)throw new Error(String(r.status));return r.json()}
-const dm=q=>jget("https://api.datamuse.com/words?"+q);
-function parseDict(arr){
-  const L={phon:"",audio:"",meanings:[],syn:[],ant:[],ety:""},M={};
-  arr.forEach(e=>{
-    if(!L.phon)L.phon=e.phonetic||((e.phonetics||[]).find(p=>p.text)||{}).text||"";
-    if(!L.audio){const a=(e.phonetics||[]).find(p=>p.audio);if(a)L.audio=a.audio.startsWith("//")?"https:"+a.audio:a.audio}
-    if(!L.ety&&e.origin)L.ety=e.origin;
-    (e.meanings||[]).forEach(m=>{const g=M[m.partOfSpeech||"other"]||(M[m.partOfSpeech||"other"]={pos:m.partOfSpeech||"other",defs:[]});
-      (m.definitions||[]).forEach(d=>{g.defs.push({d:d.definition,ex:d.example||""});(d.synonyms||[]).forEach(x=>L.syn.push(x));(d.antonyms||[]).forEach(x=>L.ant.push(x))});
-      (m.synonyms||[]).forEach(x=>L.syn.push(x));(m.antonyms||[]).forEach(x=>L.ant.push(x))})});
-  L.meanings=Object.values(M);return L}
-async function famOf(word,stem){
-  const r=await dm("sp="+encodeURIComponent(stem)+"*&md=p&max=80"),seen=new Set([word]),out=[];
-  r.forEach(x=>{const w=String(x.word||"").toLowerCase();if(!/^[a-z-]+$/.test(w)||seen.has(w)||!w.startsWith(stem)||w.length>word.length+8)return;seen.add(w);out.push({w,pos:(x.tags||[]).find(t=>POSN[t])||""})});
-  return out.filter(f=>!(f.w.endsWith("s")&&(seen.has(f.w.slice(0,-1))||f.w.slice(0,-1)===word))).slice(0,16)}
-async function etyOf(word){
-  const j=await jget("https://en.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&format=json&origin=*&titles="+encodeURIComponent(word));
-  const pg=Object.values((j.query||{}).pages||{})[0],t=(pg&&pg.extract)||"";
-  const eng=t.split(/(?:^|\n)==\s*English\s*==\s*\n/)[1]||"",sec=eng.split(/\n==\s*[^=\n]+==\s*\n/)[0]||eng;
-  const m=sec.match(/===\s*Etymology[^=\n]*===\s*\n([\s\S]*?)(?=\n===|$)/);
-  return m?m[1].trim().split("\n")[0].slice(0,300):""}
-async function lookup(word){
-  word=String(word||"").trim().toLowerCase();if(!word)return;
-  dq=word;LK={word,loading:true};selFam=new Set();tab="dict";render();scrollTo(0,0);
-  const stem=stemOf(word);
-  const [d,fam,sy,an,et]=await Promise.allSettled([jget("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(word)),famOf(word,stem),dm("rel_syn="+encodeURIComponent(word)+"&max=12"),dm("rel_ant="+encodeURIComponent(word)+"&max=10"),etyOf(word)]);
-  if([d,fam,sy,an].every(x=>x.status!=="fulfilled")){LK={word,err:"Could not reach the dictionary. Check your internet. Lookups work in the installed or downloaded app, but not inside the Claude link, because that page cannot contact other sites."};render();return}
-  const L=d.status==="fulfilled"&&Array.isArray(d.value)?parseDict(d.value):{phon:"",audio:"",meanings:[],syn:[],ant:[],ety:""};
-  if(sy.status==="fulfilled")sy.value.forEach(x=>L.syn.push(x.word));if(an.status==="fulfilled")an.value.forEach(x=>L.ant.push(x.word));
-  const uq=a=>[...new Set(a.map(x=>String(x).toLowerCase()).filter(x=>x&&x!==word))];
-  L.syn=uq(L.syn).slice(0,14);L.ant=uq(L.ant).slice(0,10);L.word=word;L.stem=stem;L.fam=fam.status==="fulfilled"?fam.value:[];
-  if(et.status==="fulfilled"&&et.value)L.ety=et.value;
-  if(!L.meanings.length&&!L.syn.length&&!L.fam.length){LK={word,err:"“"+word+"” was not found. Check the spelling."};render();return}
-  LK=L;addRecent(word);render()}
-function wrap(t,n){const o=[];let c="";String(t).split(/\s+/).forEach(w=>{if((c+" "+w).trim().length>n&&c){o.push(c);c=w}else c=(c+" "+w).trim()});if(c)o.push(c);return o}
-function rootLines(stem,ety){const m=String(ety||"").match(/\b(?:from|Latin|Greek|French|German|Old English|Middle English|Arabic|Sanskrit|Italian|Spanish)\b[^.;:]{0,70}/i),l=["ROOT",stem+"-"];
-  const t=m?m[0]:String(ety||"").slice(0,42);if(t)wrap(t,14).slice(0,3).forEach(x=>l.push(x));return l}
-function mkGroups(g,syn,ant){const o=["Noun","Verb","Adjective","Adverb"],ks=[...o.filter(k=>g[k]),...Object.keys(g).filter(k=>!o.includes(k))],out=ks.map(k=>({label:k,cls:"fam",words:g[k]}));
-  if(syn.length)out.push({label:"Synonyms",cls:"syn",words:syn.map(w=>({w}))});if(ant.length)out.push({label:"Antonyms",cls:"ant",words:ant.map(w=>({w}))});return out}
-function groupsFromCard(w){const g={};(w.family||[]).filter(f=>f.w).forEach(f=>{const k=posName(f.pos);(g[k]=g[k]||[]).push({w:f.w,self:f.w.toLowerCase()===w.word.toLowerCase()})});return mkGroups(g,csv(w.syn),csv(w.ant))}
-function groupsFromLK(L){const g={},add=(p,w,self)=>{const k=posName(p);(g[k]=g[k]||[]).push({w,self})};L.meanings.forEach(m=>add(m.pos,L.word,true));L.fam.slice(0,12).forEach(f=>add(f.pos,f.w));return mkGroups(g,L.syn.slice(0,8),L.ant.slice(0,6))}
-function diagram(lines,groups){
-  const RH=30,P=10,C={fam:["var(--accb)","var(--acc)"],syn:["var(--okb)","var(--ok)"],ant:["var(--badb)","var(--bad)"]},rows=[];let y=P;
-  groups.forEach(g=>{const ws=g.words.slice(0,9);if(!ws.length)return;rows.push({g,ws,top:y,bot:y+ws.length*RH});y+=ws.length*RH});
-  if(!rows.length)return"";
-  const rh=lines.length*16+14,H=Math.max(y+P,rh+20),cy=H/2;
-  let s=`<svg viewBox="0 0 360 ${H}" style="width:100%;max-width:520px;display:block;margin:0 auto" role="img" aria-label="Word relation diagram"><rect x="2" y="${cy-rh/2}" width="96" height="${rh}" rx="12" style="fill:var(--acc)"/>`+
-   lines.map((t,i)=>`<text x="50" y="${cy-rh/2+19+i*16}" text-anchor="middle" style="font-size:${i===1?15:10}px;font-weight:${i===1?700:400};fill:var(--on)">${esc(t)}</text>`).join("");
-  rows.forEach(r=>{const gy=(r.top+r.bot)/2,c=C[r.g.cls];
-    s+=`<path d="M98 ${cy} C 110 ${cy},110 ${gy},122 ${gy}" style="fill:none;stroke:${c[1]};stroke-width:1.5"/><rect x="122" y="${gy-13}" width="88" height="26" rx="13" style="fill:${c[1]}"/><text x="166" y="${gy+4}" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--on)">${esc(r.g.label)}</text>`;
-    r.ws.forEach((w,i)=>{const wy=r.top+i*RH+RH/2,t=w.w.length>15?w.w.slice(0,14)+"…":w.w;
-      s+=`<path d="M210 ${gy} C 221 ${gy},221 ${wy},232 ${wy}" style="fill:none;stroke:${c[1]};stroke-width:1.2;opacity:.6"/><g data-lk="${esc(w.w)}" style="cursor:pointer"><rect x="232" y="${wy-12}" width="124" height="24" rx="12" style="fill:${w.self?c[1]:c[0]};stroke:${c[1]}"/><text x="294" y="${wy+4}" text-anchor="middle" style="font-size:12.5px;fill:${w.self?"var(--on)":"var(--ink)"}">${esc(t)}</text></g>`})});
-  return s+"</svg>"}
-function playAud(u,w){try{const a=new Audio(u);a.onerror=()=>say(w);const p=a.play();if(p&&p.catch)p.catch(()=>say(w))}catch(e){say(w)}}
-function vLK(L){
-  const mine=live().find(w=>w.word.toLowerCase()===L.word.toLowerCase()),chip=(w,c)=>`<span class="chip ${c||""}" data-lk="${esc(w)}">${esc(w)}</span>`;
-  const mean=L.meanings.map(m=>`<div class="h3">${esc(posName(m.pos))}</div>`+m.defs.slice(0,4).map((d,i)=>`<div class="def"><b>${i+1}.</b> ${esc(d.d)}${d.ex?`<div class="ex">“${esc(d.ex)}” <button class="spk" data-say="${esc(d.ex)}">🔊</button></div>`:""}</div>`).join("")).join("")||`<p class="mute">No dictionary definition found. Related words are shown below.</p>`;
-  const groups=groupsFromLK(L),svg=diagram(rootLines(L.stem,L.ety),groups);
-  return`<div class="card"><div class="head"><div><div class="word">${esc(L.word)} <button class="spk" ${L.audio?`data-aud="${esc(L.audio)}" `:""}data-say="${esc(L.word)}" title="Listen">🔊</button></div><div class="sub">${esc(ipa(L.phon))}${mine&&mine.roman?` · Say it: ${esc(mine.roman)}`:""}</div></div>${mine?`<span class="tagc">✓ in your cards</span>`:""}</div>${mean}</div>`+
-  (L.syn.length||L.ant.length?`<div class="card">${L.syn.length?`<div class="h3" style="margin-top:0">Synonyms</div><div class="chips wrapc">${L.syn.map(w=>chip(w,"ok")).join("")}</div>`:""}${L.ant.length?`<div class="h3">Antonyms</div><div class="chips wrapc">${L.ant.map(w=>chip(w,"bad")).join("")}</div>`:""}</div>`:"")+
-  (svg?`<div class="card"><div class="h3" style="margin-top:0">Root &amp; relations map</div>${svg}<p class="mute">Tap any word in the map to look it up.</p>${L.ety?`<div class="h3">Origin</div><div class="txt mute">${esc(L.ety)}</div>`:""}</div>`:"")+
-  (L.fam.length?`<div class="card"><div class="h3" style="margin-top:0">Possible relatives (same stem “${esc(L.stem)}”)</div><p class="mute">Found by spelling, so check them. Tap to select the ones you want on the card.</p><div class="chips wrapc">${L.fam.map(f=>`<span class="chip ${selFam.has(f.w)?"on":""}" data-fs="${esc(f.w)}">${selFam.has(f.w)?"✓ ":"+ "}${esc(f.w)}${f.pos?` <small>${esc(f.pos)}</small>`:""}</span>`).join("")}</div></div>`:"")+
-  (L.added?`<div class="card">✅ Saved to your cards.<div class="row"><button class="sm pri" data-a="dopen">Open card</button><button class="sm" data-a="dai">Add Hindi / Urdu / Telugu with AI</button></div></div>`:`<div class="row"><button class="pri" data-a="dadd">➕ Add to my cards${selFam.size?" (+"+selFam.size+" relatives)":""}</button></div><div class="mute" style="margin-top:6px">${esc(note)}</div>`)}
-function vDict(){
-  const rec=recents().map(w=>`<span class="chip" data-lk="${esc(w)}">${esc(w)}</span>`).join("");
-  const body=!LK?"":LK.loading?`<div class="card mute">Looking up “${esc(LK.word)}”…</div>`:LK.err?`<div class="card">${esc(LK.err)}</div>`:vLK(LK);
-  return`<div class="card"><b>Dictionary</b><p class="mute">Search any English word: meanings by word type, pronunciation, synonyms, antonyms, and a map of related words.</p><div class="bar"><input id="dq" placeholder="e.g. egoist" value="${esc(dq)}" autocapitalize="off" autocomplete="off"><button class="pri" data-a="dsearch">Search</button></div>${rec?`<div class="chips wrapc">${rec}</div>`:""}</div>`+body}
-async function addLK(){
-  const L=LK;if(!L||!L.word)return;note="Adding…";render();
-  const rel=[...selFam].slice(0,8),pn=p=>posName(p)==="Other"?"":posName(p).toLowerCase();
-  const first=L.meanings.slice(0,4).map(m=>({w:L.word,pos:m.pos,pron:ipa(L.phon),meaning:(m.defs[0]||{}).d||"",ex:((m.defs.find(d=>d.ex))||{}).ex||""}));
-  const more=await Promise.all(rel.map(async w=>{const pos=pn((L.fam.find(f=>f.w===w)||{}).pos);try{const D=parseDict(await jget("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(w))),m=D.meanings[0]||{defs:[]};return{w,pos:m.pos||pos,pron:ipa(D.phon),meaning:(m.defs[0]||{}).d||"",ex:((m.defs.find(d=>d.ex))||{}).ex||""}}catch(e){return{w,pos,pron:"",meaning:"",ex:""}}}));
-  let fam=[...first,...more];if(!fam.length)fam=[{w:L.word,pos:"",pron:ipa(L.phon),meaning:"",ex:""}];
-  const exs=fam.map(f=>f.ex).filter(Boolean).slice(0,3).join("\n");
-  let p={word:cap(L.word),pron:ipa(L.phon),root:String(L.ety||"").slice(0,140),meaning:(fam.find(f=>f.meaning)||{}).meaning||"",syn:L.syn.slice(0,8).join(", "),ant:L.ant.slice(0,6).join(", "),sentences:exs,family:fam};
-  p=Object.fromEntries(Object.entries(p).filter(([k,v])=>Array.isArray(v)?v.length:v!==""));
-  const dup=live().find(w=>w.word.toLowerCase()===L.word.toLowerCase());
-  if(dup){const ex=dup.family||[];p.family=[...ex,...p.family.filter(r=>!ex.some(x=>x.w.toLowerCase()===r.w.toLowerCase()&&(x.pos||"")===(r.pos||"")))]}
-  const w=Object.assign({box:0,due:0},dup||{},p,{id:dup?dup.id:nid()});
-  note="";if(LK===L)L.added=w.id;await put(w)}
-const day=o=>new Date(Date.now()-o*864e5-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
-function st(){try{return JSON.parse(localStorage.getItem("wc2s")||"{}")}catch(e){return{}}}
-function bump(){const s=st(),t=day(0);if(s.d!==t){s.s=s.d===day(1)?(s.s||0)+1:1;s.n=0;s.d=t}s.n=(s.n||0)+1;try{localStorage.setItem("wc2s",JSON.stringify(s))}catch(e){}}
-function stats(){const s=st(),t=day(0),y=day(1);return{n:s.d===t?(s.n||0):0,s:(s.d===t||s.d===y)?(s.s||0):0}}
-function vocab(){const set=new Set();live().forEach(w=>{set.add(w.word.toLowerCase());(w.family||[]).forEach(f=>f.w&&set.add(f.w.toLowerCase()))});return set.size}
-const box=(n,l)=>`<div><b>${n}</b>${l}</div>`;
-function due(){const n=Date.now();return live().filter(w=>(w.due||0)<=n).sort((a,b)=>(a.due||0)-(b.due||0))}
-function when(ms){const h=(ms-Date.now())/36e5;return h<1?"in under an hour":h<24?"in about "+Math.round(h)+" hours":"in about "+Math.round(h/24)+" days"}
-function front(w){return`<div class="card" style="text-align:center"><div class="word" style="font-size:34px">${esc(w.word)} <button class="spk" data-say="${esc(w.word)}" title="Listen">🔊</button></div>${w.roman?`<div class="rm" style="font-size:16px;margin-top:4px">${esc(w.roman)}</div>`:""}<div class="sub">${esc(w.pron)}</div><p class="mute" style="margin-top:14px">Recall the meaning and its family words, then flip the card.</p></div>`}
-function vToday(){
-  const L=live();
-  if(!L.length)return`<div class="card"><div class="word">Welcome 👋</div><p>No words yet. Paste a word in the <b>Paste</b> tab, fill the <b>New</b> form, or start with an example.</p><div class="row"><button class="pri" data-a="ex">Add example: Egoist</button><button data-a="topaste">Go to Paste</button></div></div>`;
-  const d=due(),k=stats();
-  const top=`<div class="stats">${box(d.length,"Due now")}${box(k.n,"Done today")}${box(k.s+"🔥","Streak")}${box(vocab(),"Vocabulary")}</div>`+(k.n+d.length?`<div class="bar2"><i style="width:${Math.round(100*k.n/(k.n+d.length))}%"></i></div>`:"")+goalLine()+backupBanner();
-  if(prac){const w=L.find(x=>x.id===prac);if(w)return top+`<div class="mute" style="margin-bottom:8px">Practice mode · no schedule changes</div>`+(flip?full(w):front(w))+`<div class="row">${flip?`<button class="pri" data-a="prac">🔀 Another word</button><button data-a="pdone">Done</button>`:`<button class="pri" data-a="flip">Show card</button><button data-a="pdone">Done</button>`}</div>`;prac=null}
-  if(!d.length){const nx=L.map(w=>w.due||0).filter(x=>x>Date.now()).sort((a,b)=>a-b)[0];
-    return top+`<div class="card" style="text-align:center"><div class="word">All caught up ✅</div><p class="mute">${nx?"Next review "+when(nx)+". ":""}Want more practice?</p><div class="row"><button class="pri" data-t="quiz">🎯 Take a quiz</button><button data-a="prac">🔀 Random word</button></div></div>`}
-  const w=d[0];
-  return top+(flip?full(w):front(w))+`<div class="row">${flip?`<button data-a="again">😕 Again</button><button class="pri" data-a="knew">😀 Knew it</button>`:`<button class="pri" data-a="flip">Show card</button>`}</div>`
-}
-function strip(){const a=live();return`<div class="stats">${box(a.length,"Cards")}${box(vocab(),"Vocabulary")}${box(a.filter(w=>(w.box||0)>=3).length,"Learned")}${box(due().length,"Due now")}</div>`}
-function vWords(){
-  const s=q.toLowerCase(),idn=w=>parseInt(String(w.id).slice(1))||0;
-  const list=live().filter(w=>(!s||JSON.stringify(w).toLowerCase().includes(s))&&(!ftag||(ftag==="*hard"?(w.miss||0)>=2:tagsOf(w).includes(ftag))));
-  list.sort(sort==="new"?(a,b)=>idn(b)-idn(a):sort==="due"?(a,b)=>(a.due||0)-(b.due||0):(a,b)=>a.word.localeCompare(b.word));
-  return strip()+`<input id="q" placeholder="Search ${live().length} words…" value="${esc(q)}"><div class="chips" style="padding:10px 0 2px">${tagPills()}</div><div class="bar" style="margin-top:6px;flex-wrap:wrap">${[["az","A–Z"],["new","Newest"],["due","Due soon"]].map(([k,l])=>`<span class="pill ${sort===k?"on":""}" data-s="${k}">${l}</span>`).join("")}<span style="flex:1"></span><button class="sm" data-a="xall">Expand all</button><button class="sm" data-a="call">Collapse</button></div><div class="bar"><button class="sm" data-a="exp">⬇ Export backup</button><button class="sm" data-a="imp">⬆ Import backup</button></div><div id="note" class="mute">${esc(note)}</div>`+(list.map(item).join("")||`<p class="mute">No words found.</p>`)
-}
-const blocks=t=>t.split(/^\s*-{3,}\s*$/m).map(x=>x.trim()).filter(Boolean);
-function aiPrompt(ws){const list=ws.split(/[,\n]+/).map(x=>x.trim()).filter(Boolean),many=list.length>1;
-return`Create a vocabulary card for ${many?"each of these English words: "+list.join(", ")+". Put a line with only ----- between the cards.":"the English word: "+(list[0]||"[YOUR WORD]")+"."}
-
-Reply in plain text only (no tables, no bold, no markdown, no extra talk). Copy the structure, headings and line style of the example card below exactly, but with the new word's own content. The first line must be the new word itself, with no brackets and no label. In "Grammar family", list EVERY related word (noun, verb, adjective, adverb and related forms), one per line, each with its type in brackets, /IPA/, [Roman-letter pronunciation], a dash, the meaning, and "Example:" with a sentence. Keep the Hindi, Urdu and Telugu translations accurate and natural.
-
-EXAMPLE CARD (for the word egoist):
-${TPL}`}
-async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch(e){const a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand("copy")}catch(x){}a.remove();return ok}}
-function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=cfg.voice;u.rate=parseFloat(cfg.rate)||.85;speechSynthesis.speak(u)}catch(e){}}
-function vPaste(){
-  const ps=blocks(ptxt).map(parse).filter(p=>p.word);let prev="";
-  if(ps.length===1)prev=`<div class="mute" style="margin-bottom:8px">Preview: this is how it will be added</div>${full(ps[0])}<div class="row"><button data-a="editp">Edit first</button><button class="pri" data-a="addp">Add to word list</button></div>`;
-  else if(ps.length>1)prev=`<div class="card"><div class="h3">${ps.length} words found</div>${ps.map(p=>`<div class="fam"><b>${esc(p.word)}</b> <span class="mute">· ${p.family.length} family words</span></div>`).join("")}<div class="row"><button class="pri" data-a="addp">Add all ${ps.length} words</button></div></div>`;
-  else if(ptxt.trim())prev=`<p class="mute">I couldn’t find the word. Put it on the first line, or write “Word: …”.</p>`;
-  return`<div class="card"><b>1 · Get the card from an AI</b><p class="mute">Type a word (or several, separated by commas), copy the prompt, paste it into any AI chat, then bring the reply back here.</p><input id="pw" placeholder="e.g. egoist, altruist" value="${esc(pword)}"><div class="row"><button class="pri" data-a="cp">📋 Copy AI prompt</button></div><div id="cpn" class="mute" style="margin-top:6px">${esc(cpnote)}</div></div><div class="card"><b>2 · Paste the reply</b><p class="mute">Headings are sorted into the right places. For many words, put a line with only <b>-----</b> between cards.</p><textarea id="pt" style="min-height:170px" placeholder="Paste here…">${esc(ptxt)}</textarea><div class="row"><button data-a="tpl">Insert example format</button><button data-a="clr">Clear</button></div></div>`+prev
-}
-const blank=()=>({word:"",pron:"",roman:"",root:"",tags:"",syn:"",ant:"",meaning:"",translations:"",context:"",confuse:"",sentences:"",family:[{w:"",pos:"",pron:"",meaning:"",ex:""}]});
-function vNew(){
-  if(!draft)draft=blank();const d=draft,f=(k,l,ta)=>`<label>${l}</label>${ta?`<textarea data-d="${k}">${esc(d[k])}</textarea>`:`<input data-d="${k}" value="${esc(d[k])}">`}`;
-  return`<div class="card"><b>${editing?"Edit word":"New word"}</b>${f("word","Word")}${f("pron","Pronunciation (IPA)")}${f("roman","Say it in Roman letters (e.g. ee-GO-ist)")}${f("root","Root / origin")}${f("meaning","Main meaning",1)}${f("tags","Tags (comma separated, e.g. personality, office)")}${f("syn","Synonyms (comma separated)")}${f("ant","Antonyms (comma separated)")}<div class="h3" style="margin-top:18px">Word family (each word with its own pronunciation, meaning, example)</div>`+
-  d.family.map((x,i)=>`<div class="frow"><input data-fi="${i}" data-fk="w" placeholder="Word (e.g. Egotist)" value="${esc(x.w)}"><input data-fi="${i}" data-fk="pos" placeholder="Type (noun / adjective…)" value="${esc(x.pos)}"><input data-fi="${i}" data-fk="pron" placeholder="Pronunciation /IPA/" value="${esc(x.pron)}"><input data-fi="${i}" data-fk="roman" placeholder="Say it in Roman letters (ee-GO-ist)" value="${esc(x.roman)}"><input data-fi="${i}" data-fk="meaning" placeholder="Meaning" value="${esc(x.meaning)}"><input data-fi="${i}" data-fk="ex" placeholder="Example sentence" value="${esc(x.ex)}"><button class="sm" data-rf="${i}">Remove</button></div>`).join("")+
-  `<div class="row"><button data-a="addf">+ Add family word</button></div>`+SECS.map(([k,l])=>f(k,l,1)).join("")+`<div class="row"><button class="pri" data-a="save">Save card</button>${editing?`<button data-a="cancel">Cancel</button>`:""}</div></div>`
-}
-/* ---------- quiz ---------- */
-function pool(){const p=[];scoped().forEach(w=>{const fam=(w.family||[]).filter(f=>f.w&&f.meaning);fam.forEach(f=>p.push({w:f.w,m:f.meaning,e:f.ex||"",h:w.id}));
-  const fl=(w.meaning||w.meanings||"").split("\n")[0];if(fl&&!fam.some(f=>f.w.toLowerCase()===w.word.toLowerCase()))p.push({w:w.word,m:fl,e:(w.sentences||"").split("\n")[0]||"",h:w.id})});const hs=new Map(live().map(w=>[w.id,w]));p.forEach(it=>{const w=hs.get(it.h);if(w&&it.w.toLowerCase()===w.word.toLowerCase()){it.s=csv(w.syn);it.a=csv(w.ant)}});return p}
-function startQuiz(){
-  const p=pool(),need=qmode==="type"?1:4;if(p.length<need){note=qmode==="type"?"No words with meanings in this set yet.":"Need at least 4 words with meanings (family words count) in this set.";render();return}
-  const dist=it=>shuffle(p.filter(o=>o!==it&&o.w.toLowerCase()!==it.w.toLowerCase())).slice(0,3);
-  Q={i:0,score:0,wrong:[],sel:null,ok:false,typed:"",qs:shuffle(p).slice(0,qn).map(it=>{
-    if(qmode==="type")return{it,k:"type",opts:[]};
-    const k=["def","word"];if(it.e&&it.e.toLowerCase().includes(it.w.toLowerCase()))k.push("blank");
-    if(it.s&&it.s.length)k.push("syn");if(it.a&&it.a.length)k.push("ant");
-    const kk=k[Math.floor(Math.random()*k.length)];
-    if(kk==="syn"||kk==="ant"){const list=kk==="syn"?it.s:it.a,lc=list.map(x=>x.toLowerCase()),ans={w:list[Math.floor(Math.random()*list.length)]},ds=shuffle(p.filter(o=>o.w.toLowerCase()!==it.w.toLowerCase()&&!lc.includes(o.w.toLowerCase()))).slice(0,3).map(o=>({w:o.w}));
-      if(ds.length>=3)return{it,k:kk,ans,opts:shuffle([ans,...ds])}}
-    return{it,k:kk==="syn"||kk==="ant"?"def":kk,opts:shuffle([it,...dist(it)])}})};render()}
-function vQuiz(){
-  if(!Q){const n=pool().length,tags=[...new Set(live().flatMap(tagsOf))].sort(),hn=live().filter(w=>(w.miss||0)>=2).length;
-    return`<div class="card"><div class="word">Quick quiz 🎯</div><p class="mute">Made from your own words, meanings and examples. ${n} items in this set.</p><label>Mode</label><div>${[["choice","Choose answer"],["type","Type the word"]].map(([k,l])=>`<span class="pill ${qmode===k?"on":""}" data-qm="${k}">${l}</span>`).join("")}</div><label>Words</label><div>${[["all","All"],["hard","🔥 Hard ("+hn+")"],...tags.map(t=>["tag:"+t,"#"+t])].map(([k,l])=>`<span class="pill ${qscope===k?"on":""}" data-qs="${esc(k)}">${esc(l)}</span>`).join("")}</div><label>Length</label><div>${[5,10,20].map(x=>`<span class="pill ${x===qn?"on":""}" data-n="${x}">${x} questions</span>`).join("")}</div><div class="row"><button class="pri" data-a="qstart">Start quiz</button></div><p class="mute">${esc(note)}</p></div>`}
-  if(Q.i>=Q.qs.length){const wr=Q.wrong.map(x=>`<div class="fam"><b>${esc(x.w)}</b> – ${esc(x.m)}</div>`).join("");
-    return`<div class="card" style="text-align:center"><div class="big">${Q.score}/${Q.qs.length}</div><p>${Q.score===Q.qs.length?"Perfect! 🎉":"Good effort. Review the ones you missed."}</p></div>${wr?`<div class="card"><div class="h3">Missed</div>${wr}<div class="row"><button data-a="qmiss">Add missed words to Today</button></div></div>`:""}<div class="row"><button class="pri" data-a="qagain">New quiz</button><button data-a="qquit">Done</button></div>`}
-  const c=Q.qs[Q.i],it=c.it;let ask;
-  if(c.k==="syn")ask=`Which word is closest in meaning to <b>${esc(it.w)}</b>?`;else if(c.k==="ant")ask=`Which word is the opposite of <b>${esc(it.w)}</b>?`;else if(c.k==="type")ask=`Type the word that means:<br><i>${esc(it.m)}</i><br><span class="mute">Hint: ${esc(it.w[0])}${" _".repeat(Math.max(0,it.w.length-1))} (${it.w.length} letters)</span>`;else if(c.k==="def")ask=`What does <b>${esc(it.w)}</b> mean?`;else if(c.k==="word")ask=`Which word means: <i>${esc(it.m)}</i>`;
-  else ask=`Fill in the blank:<br><i>“${esc(it.e.replace(new RegExp(it.w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i"),"_____"))}”</i>`;
-  const opts=c.k==="type"?(Q.sel===null?`<input id="ta" placeholder="Type the word" autocapitalize="off" autocomplete="off" style="margin-top:8px"><div class="row"><button class="pri" data-a="qcheck">Check</button><button data-a="qskip">Show answer</button></div>`:`<div class="opt ${Q.ok?"ok":"bad"}" style="cursor:default">Your answer: ${esc(Q.typed)}</div>`):c.opts.map((o,i)=>{let cl="";if(Q.sel!==null){if(o===(c.ans||it))cl="ok";else if(i===Q.sel)cl="bad"}return`<button class="opt ${cl}" data-o="${i}" ${Q.sel!==null?"disabled":""}>${esc(c.k==="def"?o.m:o.w)}</button>`}).join("");
-  const fb=Q.sel!==null?`<div class="fam" style="margin-top:12px"><b>${esc(it.w)}</b><button class="spk" data-say="${esc(it.w)}" title="Listen">🔊</button> – ${esc(it.m)}${it.e?`<div class="ex">“${esc(it.e)}”</div>`:""}</div><div class="row"><button class="pri" data-a="qnext">${Q.i+1>=Q.qs.length?"See score":"Next"}</button></div>`:"";
-  return`<div class="mute">Question ${Q.i+1} of ${Q.qs.length} · score ${Q.score}</div><div class="card"><div class="q">${ask}</div>${opts}${fb}</div><div class="row"><button class="sm" data-a="qquit">Quit quiz</button></div>`
-}
-/* ---------- render + events ---------- */
-function render(){
-  $("tabs").innerHTML=TABS.map(([k,i,l])=>`<button data-t="${k}" class="${k===tab?"on":""}"><span>${i}</span>${l}</button>`).join("");
-  const V={today:vToday,words:vWords,dict:vDict,quiz:vQuiz,paste:vPaste,new:vNew,set:vSet};
-  [...TABS.map(t=>t[0]),"set"].forEach(k=>$("v-"+k).classList.toggle("hide",k!==tab));$("v-"+tab).innerHTML=V[tab]()
-}
-const go=t=>{tab=t;flip=false;prac=null;if(t!=="new"){editing=null;draft=null}note="";render();scrollTo(0,0)};
-const fillIdx=()=>{const i=$("q");if(i){i.focus();i.setSelectionRange(q.length,q.length)}};
-async function dl(name,text){
-  try{if(typeof claude!=="undefined"){const d=await claude.use("downloads");if(d){await d.save({filename:name,data:text});return}}}catch(e){}
-  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:"application/json"}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
-async function addWord(p,ask){
-  const dup=live().find(w=>w.word.toLowerCase()===p.word.toLowerCase());
-  if(dup&&ask&&!confirm("“"+p.word+"” already exists. Replace it?"))return false;
-  await put(Object.assign({box:0,due:0},dup||{},p,{id:dup?dup.id:nid()}));return true}
-document.addEventListener("click",async e=>{
-  const t=e.target.closest("[data-t],[data-a],[data-edit],[data-del],[data-o],[data-n],[data-rf],[data-say],[data-x],[data-sub],[data-s],[data-tag],[data-qm],[data-qs],[data-cfg],[data-aud],[data-lk],[data-fs]");if(!t)return;const D=t.dataset;
-  if(D.aud){playAud(D.aud,D.say);return}
-  if(D.say){say(D.say);return}
-  if(D.lk){lookup(D.lk);return}
-  if(D.fs){selFam.has(D.fs)?selFam.delete(D.fs):selFam.add(D.fs);return render()}
-  if(D.x){OPEN.has(D.x)?OPEN.delete(D.x):OPEN.add(D.x);return render()}
-  if(D.sub){const [i,k]=D.sub.split("|");SUB[i]=k;return render()}
-  if(D.s){sort=D.s;return render()}
-  if(D.tag!==undefined){ftag=D.tag;return render()}
-  if(D.qm){qmode=D.qm;return render()}
-  if(D.qs){qscope=D.qs;return render()}
-  if(D.cfg){const i=D.cfg.indexOf("|");cfg[D.cfg.slice(0,i)]=D.cfg.slice(i+1);saveCfg();applyCfg();return render()}
-  if(D.t)return go(D.t);
-  if(D.n){qn=+D.n;return render()}
-  if(D.o!==undefined){if(Q.sel!==null)return;const c=Q.qs[Q.i];Q.sel=+D.o;if(c.opts[Q.sel]===(c.ans||c.it)){Q.score++;okIt(c.it)}else{Q.wrong.push(c.it);missIt(c.it)}return render()}
-  if(D.edit){editing=D.edit;const w=words.find(x=>x.id===editing);draft=JSON.parse(JSON.stringify(w));draft.family=draft.family&&draft.family.length?draft.family:[{w:"",pos:"",pron:"",meaning:"",ex:""}];if(!draft.meaning&&draft.meanings)draft.meaning=draft.meanings;tab="new";render();return scrollTo(0,0)}
-  if(D.del){if(confirm("Delete this card?"))del(D.del);return}
-  if(D.rf!==undefined){draft.family.splice(+D.rf,1);return render()}
-  const a=D.a;
-  if(a==="flip"){flip=true;render()}
-  else if(a==="prac"){const L=live();if(L.length){prac=L[Math.floor(Math.random()*L.length)].id;flip=false}render()}
-  else if(a==="pdone"){prac=null;flip=false;render()}
-  else if(a==="xall"){OPEN=new Set(live().map(w=>w.id));render()}
-  else if(a==="call"){OPEN=new Set();render()}
-  else if(a==="dsearch"){lookup(($("dq")||{}).value||dq)}
-  else if(a==="dadd"){await addLK()}
-  else if(a==="dopen"){if(LK&&LK.added){OPEN.add(LK.added);go("words")}}
-  else if(a==="dai"){pword=LK?LK.word:"";go("paste")}
-  else if(a==="gplus"||a==="gminus"){cfg.goal=Math.max(0,Math.min(20,(+cfg.goal||0)+(a==="gplus"?1:-1)));saveCfg();render()}
-  else if(a==="snooze"){try{localStorage.setItem("wc2b",String(Date.now()-5*DAY))}catch(e){}render()}
-  else if(a==="cpbk"){note=(await copyText(JSON.stringify(live())))?"Backup copied. Paste it on your other device under Restore.":"Could not copy automatically. Use Export file instead.";render()}
-  else if(a==="rbk"){try{const l=JSON.parse(($("rb").value||"").trim());if(!Array.isArray(l))throw 0;l.forEach(w=>{w.u=Date.now()});mergeIn(l);note="Restored "+l.length+" words."}catch(x){note="That text is not a valid backup."}render()}
-  else if(a==="knew"||a==="again"){const w=due()[0];if(!w)return;const ok=a==="knew",b=ok?Math.min((w.box||0)+1,6):0;if(!ok)w.miss=(w.miss||0)+1;else if(w.miss)w.miss--;w.box=b;w.due=ok?Date.now()+STEPS[b]*DAY:Date.now()+6e5;flip=false;bump();put(w)}
-  else if(a==="ex"){await addWord(parse(TPL),false)}
-  else if(a==="topaste")go("paste");
-  else if(a==="cp"){const ok=await copyText(aiPrompt(pword));cpnote=ok?"Copied! Paste it into an AI chat, then paste the reply below.":"Could not copy automatically. Select the text manually from the AI prompt below.";const n=$("cpn");if(n)n.textContent=cpnote}
-  else if(a==="tpl"){ptxt=TPL;render()}
-  else if(a==="clr"){ptxt="";render()}
-  else if(a==="addp"){for(const p of blocks(ptxt).map(parse).filter(p=>p.word))await addWord(p,true);ptxt="";tab="words";render();scrollTo(0,0)}
-  else if(a==="editp"){draft=Object.assign(blank(),parse(blocks(ptxt)[0]||""));if(!draft.family.length)draft.family=blank().family;ptxt="";tab="new";render();scrollTo(0,0)}
-  else if(a==="addf"){draft.family.push({w:"",pos:"",pron:"",meaning:"",ex:""});render()}
-  else if(a==="cancel")go("words");
-  else if(a==="save"){if(!draft.word.trim()){alert("Please enter the word.");return}
-    const p=JSON.parse(JSON.stringify(draft));p.family=p.family.filter(f=>f.w.trim());delete p.grammar;delete p.meanings;
-    const old=editing?words.find(x=>x.id===editing):null;await put(Object.assign({box:0,due:0},old||{},p,{id:old?old.id:nid()}));editing=null;draft=null;tab="words";render();scrollTo(0,0)}
-  else if(a==="exp"){await dl("my-word-cards.json",JSON.stringify(live(),null,2));try{localStorage.setItem("wc2b",String(Date.now()))}catch(e){}render()}
-  else if(a==="imp")$("imp").click();
-  else if(a==="qstart"||a==="qagain")startQuiz();
-  else if(a==="qcheck"||a==="qskip"){const c=Q.qs[Q.i],v=a==="qcheck"?($("ta").value||"").trim():"";if(a==="qcheck"&&!v){$("ta").focus();return}Q.typed=a==="qskip"?"(showed answer)":v;Q.ok=a==="qcheck"&&v.toLowerCase()===c.it.w.toLowerCase();Q.sel=1;if(Q.ok){Q.score++;okIt(c.it)}else{Q.wrong.push(c.it);missIt(c.it)}render()}
-  else if(a==="qnext"){Q.i++;Q.sel=null;Q.typed="";render()}
-  else if(a==="qquit"){Q=null;render()}
-  else if(a==="qmiss"){const ids=new Set(Q.wrong.map(x=>x.h));for(const w of live())if(ids.has(w.id)){w.due=0;w.box=0;await put(w)}Q=null;go("today")}
-});
-document.addEventListener("input",e=>{const t=e.target;
-  if(t.id==="q"){q=t.value;$("v-words").innerHTML=vWords();fillIdx()}
-  else if(t.id==="pw")pword=t.value;
-  else if(t.id==="dq")dq=t.value;
-  else if(t.id==="pt"){ptxt=t.value;const pos=t.selectionStart;$("v-paste").innerHTML=vPaste();const n=$("pt");n.focus();n.setSelectionRange(pos,pos)}
-  else if(t.dataset.d)draft[t.dataset.d]=t.value;
-  else if(t.dataset.fi!==undefined)draft.family[+t.dataset.fi][t.dataset.fk]=t.value});
-document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="ta"){e.preventDefault();const b=document.querySelector('[data-a="qcheck"]');if(b)b.click()}if(e.key==="Enter"&&e.target.id==="dq"){e.preventDefault();lookup(e.target.value)}});
-$("imp").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;
-  try{const list=JSON.parse(await f.text());if(!Array.isArray(list))throw 0;list.forEach(w=>{w.u=Date.now()});mergeIn(list);note="Imported "+list.length+" words.";render()}catch(x){note="That file could not be read.";render()}e.target.value=""});
-init();
+const stem=w=>{for(const s of SUF)if(w.endsWith(s)&&w.length-s.length>=3)return w.slice(0,-s.length);return w};
+const ipa=t=>t?"/"+String(t).replace(/^\/|\/$/g,"")+"/":"";
+function pd(arr){const L={phon:"",audio:"",meanings:[],syn:[],ant:[],ety:""},M={};arr.forEach(e=>{if(!L.phon)L.phon=e.phonetic||((e.phonetics||[]).find(p=>p.text)||{}).text||"";if(!L.audio){const a=(e.phonetics||[]).find(p=>p.audio);if(a)L.audio=a.audio.startsWith("//")?"https:"+a.audio:a.audio}if(!L.ety&&e.origin)L.ety=e.origin;
+ (e.meanings||[]).forEach(m=>{const k=m.partOfSpeech||"other",g=M[k]||(M[k]={pos:k,defs:[]});(m.definitions||[]).forEach(d=>{g.defs.push({d:d.definition,ex:d.example||""});L.syn.push(...(d.synonyms||[]));L.ant.push(...(d.antonyms||[]))});L.syn.push(...(m.synonyms||[]));L.ant.push(...(m.antonyms||[]))})});L.meanings=Object.values(M);return L}
+async function famOf(w,s){const r=await dm("sp="+encodeURIComponent(s)+"*&md=p&max=80"),seen=new Set([w]),o=[];r.forEach(x=>{const k=String(x.word||"").toLowerCase();if(!/^[a-z-]+$/.test(k)||seen.has(k)||!k.startsWith(s)||k.length>w.length+8)return;seen.add(k);o.push({w:k,pos:POSN[(x.tags||[]).find(t=>POSN[t])]||""})});return o.filter(f=>!(f.w.endsWith("s")&&(seen.has(f.w.slice(0,-1))||f.w.slice(0,-1)===w))).slice(0,10)}
+async function etyOf(w){const j=await jget("https://en.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&format=json&origin=*&titles="+encodeURIComponent(w)),pg=Object.values((j.query||{}).pages||{})[0],t=(pg&&pg.extract)||"",e=t.split(/(?:^|\n)==\s*English\s*==\s*\n/)[1]||"",s=e.split(/\n==\s*[^=\n]+==\s*\n/)[0]||e,m=s.match(/===\s*Etymology[^=\n]*===\s*\n([\s\S]*?)(?=\n===|$)/);return m?m[1].trim().split("\n")[0].slice(0,300):""}
+async function prof(word,full){word=word.trim().toLowerCase();const s=stem(word),ok=r=>r.status==="fulfilled",
+ [d,sy,an,f,e]=await Promise.allSettled([jget("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(word)),dm("rel_syn="+encodeURIComponent(word)+"&max=10"),dm("rel_ant="+encodeURIComponent(word)+"&max=8"),full?famOf(word,s):[],full?etyOf(word):""]);
+ if(!ok(d)&&!ok(sy)&&!ok(an))throw new Error("net");const L=ok(d)&&Array.isArray(d.value)?pd(d.value):{phon:"",audio:"",meanings:[],syn:[],ant:[],ety:""};
+ if(ok(sy))L.syn.push(...sy.value.map(x=>x.word));if(ok(an))L.ant.push(...an.value.map(x=>x.word));const u=a=>[...new Set(a.map(x=>String(x).toLowerCase()).filter(x=>x&&x!==word))];
+ L.syn=u(L.syn).slice(0,10);L.ant=u(L.ant).slice(0,8);L.word=word;L.stem=s;L.fam=ok(f)?f.value:[];if(ok(e)&&e.value)L.ety=e.value;L.found=L.meanings.length>0;return L}
+async function lookup(w){w=String(w||"").trim().toLowerCase();if(!w)return;sq=w;P={word:w,loading:1};RO=new Set();tab="search";sm="one";render();scrollTo(0,0);
+ try{P=await prof(w,true);if(!P.found&&!P.syn.length&&!P.fam.length)P={word:w,err:"“"+w+"” was not found. Check the spelling."};else{const r=JD("wc2r",[]);SV("wc2r",[w,...r.filter(x=>x!==w)].slice(0,12))}}
+ catch(e){P={word:w,err:"Could not reach the free dictionary services. Check your internet. Lookups do not work inside the Claude link; use the installed or downloaded app."}}render()}
+/* translation: MyMemory (free, machine translation) */
+function T(t){if(cfg.lang==="en"||!t)return"";const k=cfg.lang+"|"+t;if(TC[k])return`<div class="trl">${esc(TC[k])}</div>`;if(!TP[k]){TP[k]=1;fetch("https://api.mymemory.translated.net/get?q="+encodeURIComponent(t.slice(0,450))+"&langpair=en|"+cfg.lang).then(r=>r.json()).then(j=>{const x=(j.responseData||{}).translatedText||"";TC[k]=/MYMEMORY WARNING|INVALID/i.test(x)||!x?"(translation unavailable now)":x;SV("wc3t",TC);render()}).catch(()=>{TC[k]="(translation unavailable now)";render()})}return`<div class="trl">…</div>`}
+const trNote=()=>cfg.lang==="en"?"":`<p class="mute">Translations are machine-generated (MyMemory) and may be inaccurate. Check important ones.</p>`;
+/* verb tenses */
+const IRR={go:"went,gone",do:"did,done",have:"had,had",see:"saw,seen",take:"took,taken",make:"made,made",come:"came,come",give:"gave,given",get:"got,got",know:"knew,known",think:"thought,thought",write:"wrote,written",read:"read,read",run:"ran,run",eat:"ate,eaten",begin:"began,begun",break:"broke,broken",bring:"brought,brought",buy:"bought,bought",choose:"chose,chosen",drive:"drove,driven",fall:"fell,fallen",feel:"felt,felt",find:"found,found",fly:"flew,flown",forget:"forgot,forgotten",hold:"held,held",keep:"kept,kept",leave:"left,left",lose:"lost,lost",meet:"met,met",pay:"paid,paid",put:"put,put",say:"said,said",sell:"sold,sold",send:"sent,sent",sing:"sang,sung",sit:"sat,sat",speak:"spoke,spoken",stand:"stood,stood",teach:"taught,taught",tell:"told,told",win:"won,won",wear:"wore,worn"};
+function vf(b){const ir=IRR[b],y=/[^aeiou]y$/.test(b),cvc=/^[^aeiou]*[aeiou][^aeiouwxy]$/.test(b)&&b.length<=4;let p=b.endsWith("e")?b+"d":y?b.slice(0,-1)+"ied":cvc?b+b.slice(-1)+"ed":b+"ed",pp=p;if(ir)[p,pp]=ir.split(",");
+ return{b,s:b==="have"?"has":/(s|x|z|ch|sh|o)$/.test(b)?b+"es":y?b.slice(0,-1)+"ies":b+"s",g:b.endsWith("ie")?b.slice(0,-2)+"ying":/[^e]e$/.test(b)?b.slice(0,-1)+"ing":cvc?b+b.slice(-1)+"ing":b+"ing",p,pp,irr:!!ir}}
+const TEN=[["Present simple","Habits, facts, routines",f=>[f.s,"does not "+f.b,"does she "+f.b]],["Present continuous","Happening now",f=>["is "+f.g,"is not "+f.g,"is she "+f.g]],["Present perfect","Past action linked to now",f=>["has "+f.pp,"has not "+f.pp,"has she "+f.pp]],["Present perfect continuous","Action continuing up to now",f=>["has been "+f.g,"has not been "+f.g,"has she been "+f.g]],["Past simple","Finished past action",f=>[f.p,"did not "+f.b,"did she "+f.b]],["Past continuous","In progress at a past time",f=>["was "+f.g,"was not "+f.g,"was she "+f.g]],["Past perfect","Before another past time",f=>["had "+f.pp,"had not "+f.pp,"had she "+f.pp]],["Past perfect continuous","Ongoing before a past time",f=>["had been "+f.g,"had not been "+f.g,"had she been "+f.g]],["Future simple","Decisions, predictions",f=>["will "+f.b,"will not "+f.b,"will she "+f.b]],["Future continuous","In progress at a future time",f=>["will be "+f.g,"will not be "+f.g,"will she be "+f.g]],["Future perfect","Completed by a future time",f=>["will have "+f.pp,"will not have "+f.pp,"will she have "+f.pp]],["Future perfect continuous","Ongoing up to a future time",f=>["will have been "+f.g,"will not have been "+f.g,"will she have been "+f.g]]];
+function tenses(w){const f=vf(w);return`<h3>Verb tenses (form patterns)</h3><p class="mute">These show how “${esc(w)}” changes in each tense. They are patterns, not natural sentences. ${f.irr?"":"Forms follow regular rules, so check irregular spellings."}</p>`+TEN.map(([n,e,g],i)=>{const [a,b,c]=g(f);return`<details><summary>${i+1}. ${n}</summary><div class="mute">${e}</div><div>✅ She <mark>${esc(a)}</mark>.</div><div>❌ She <mark>${esc(b)}</mark>.</div><div>❓ <mark>${esc(c.split(" she ")[0])}</mark> she ${esc(c.split(" she ")[1])}?</div></details>`}).join("")}
+/* diagram: radial, clickable */
+function diagram(L){const G=[["Family",L.fam.slice(0,6),"var(--acc)"],["Synonyms",L.syn.slice(0,6),"var(--ok)"],["Antonyms",L.ant.slice(0,5),"var(--bad)"]],N=[];G.forEach(([n,a,c])=>a.forEach(x=>N.push({w:x.w||x,c})));if(!N.length)return"";
+ let s=`<svg viewBox="0 0 460 420" style="width:100%;max-width:560px;display:block;margin:auto" role="img" aria-label="Word relationship diagram">`,cx=230,cy=210,R=125;
+ N.forEach((n,i)=>{const a=-Math.PI/2+2*Math.PI*i/N.length,x=cx+R*Math.cos(a),y=cy+R*Math.sin(a),r=Math.cos(a)>.2?"start":Math.cos(a)<-.2?"end":"middle",tx=x+(r==="start"?9:r==="end"?-9:0),ty=y+(r==="middle"?(Math.sin(a)>0?20:-12):4);
+  s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" style="stroke:${n.c};stroke-width:1.4;opacity:.55"/><g data-lk="${esc(n.w)}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="7" style="fill:${n.c}"/><text x="${tx}" y="${ty}" text-anchor="${r}" style="font-size:13px;fill:var(--ink)">${esc(n.w.length>14?n.w.slice(0,13)+"…":n.w)}</text></g>`});
+ return s+`<circle cx="${cx}" cy="${cy}" r="40" style="fill:var(--acc)"/><text x="${cx}" y="${cy+5}" text-anchor="middle" style="font-size:15px;font-weight:700;fill:var(--on)">${esc(L.word.length>10?L.word.slice(0,9)+"…":L.word)}</text></svg><div class="row"><span class="pill on">● Family</span><span class="pill ok">● Synonyms</span><span class="pill bad">● Antonyms</span></div>`}
+/* views */
+const NAV=[["home","🏠","Home"],["search","🔍","Word Search"],["practice","🎯","Practice"],["saved","📚","Saved Words"],["set","⚙️","Settings"]];
+const langs=()=>[["en","English"],["hi","हिन्दी"],["te","తెలుగు"]].map(([k,l])=>`<span class="pill ${cfg.lang===k?"on":""}" data-lang="${k}">${l}</span>`).join("");
+const spk=(w,u)=>`<button class="spk" ${u?`data-aud="${esc(u)}" `:""}data-say="${esc(w)}" title="Listen">🔊</button>`;
+function relRow(w,kind,L){const o=RO.has(w),c=RC[w],ex={syn:"Similar in meaning to “"+L.word+"”.",ant:"Opposite in meaning to “"+L.word+"”.",fam:"Shares the stem “"+L.stem+"-” with “"+L.word+"”. Spelling-based, so confirm the meaning is really linked."}[kind],t={syn:"Synonym",ant:"Antonym",fam:"Same stem"}[kind];
+ return`<div class="rel"><div class="rh" data-rel="${esc(w)}"><b>${esc(w)}</b><span class="tg ${kind==="syn"?"ok":kind==="ant"?"bad":""}">${t}</span><span class="grow"></span>▾</div>${o?`<div class="rb"><div class="mute">${ex}</div>${c==="x"?`<div class="mute">No definition found for this word.</div>`:c?c.meanings.slice(0,2).map(m=>`<div class="def"><span class="tg">${esc(m.pos)}</span> ${esc(m.defs[0].d)}${m.defs[0].ex?`<div class="ex">“${esc(m.defs[0].ex)}”</div>`:""}${T(m.defs[0].d)}</div>`).join("")+`<button class="sm" data-lk="${esc(w)}">Open full page</button>`:`<div class="mute">Loading…</div>`}</div>`:""}</div>`}
+function vProf(L,compact){
+ const mean=L.meanings.map(m=>`<h3>${esc(m.pos)}</h3>`+m.defs.slice(0,compact?1:4).map((d,i)=>`<div class="def"><b>${i+1}.</b> ${esc(d.d)}${T(d.d)}${d.ex&&!compact?`<div class="ex">“${esc(d.ex)}” ${spk(d.ex)}</div>${T(d.ex)}`:""}</div>`).join("")).join("")||`<p class="mute">No dictionary definition found. Only related words were found.</p>`;
+ const sv=live().find(w=>w.word.toLowerCase()===L.word);
+ return`<div class="card"><div class="row" style="margin:0"><div class="big">${esc(L.word)}</div>${spk(L.word,L.audio)}<span class="grow"></span><button class="sm" data-a="cpw" data-w="${esc(L.word)}">Copy profile</button>${sv?`<span class="tg ok">saved</span>`:`<button class="sm pri" data-a="sv" data-w="${esc(L.word)}">Save</button>`}</div><div class="mute">${esc(ipa(L.phon))}${L.audio?"":" · no recorded audio (device voice used)"}</div>${mean}${trNote()}</div>`+(compact?"":
+ (L.meanings.some(m=>m.pos==="verb")?`<div class="card">${tenses(L.word)}</div>`:"")+
+ `<div class="card"><h3 style="margin-top:0">Related words</h3><p class="mute">Tap a word to see its own meaning, word type and example.</p>${L.syn.map(w=>relRow(w,"syn",L)).join("")}${L.ant.map(w=>relRow(w,"ant",L)).join("")}${L.fam.map(f=>relRow(f.w,"fam",L)).join("")}${L.syn.length+L.ant.length+L.fam.length?"":`<p class="mute">No related words found.</p>`}</div>`+
+ (diagram(L)?`<div class="card"><h3 style="margin-top:0">Word map</h3>${diagram(L)}<p class="mute">The centre is “${esc(L.word)}”. Green words mean about the same, red words mean the opposite, and blue words share its stem. Tap a word to open it.</p></div>`:"")+
+ `<div class="card"><h3 style="margin-top:0">Origin</h3><div>${L.ety?esc(L.ety):`<span class="mute">No origin found for this word. Prefix and suffix analysis is not included.</span>`}</div><p class="mute">Sources: Free Dictionary API, Datamuse, Wiktionary, MyMemory. Free services can be incomplete or unavailable.</p></div>`)}
+function vHome(){const a=live(),due=a.filter(w=>(w.due||0)<=Date.now()),hard=a.filter(w=>(w.miss||0)>=2).length,q=JD("wc3q",{c:0,n:0}),rec=JD("wc2r",[]),last=a.slice().sort((x,y)=>(parseInt(String(y.id).slice(1))||0)-(parseInt(String(x.id).slice(1))||0)).slice(0,5);
+ return`<h2>Welcome 👋</h2><div class="card"><div class="row" style="margin:0"><input id="hq" placeholder="Search any English word…" style="flex:1"><button class="pri" data-a="hs">Search</button></div>${rec.length?`<div style="margin-top:10px">${rec.map(w=>`<span class="pill" data-lk="${esc(w)}">${esc(w)}</span>`).join("")}</div>`:""}</div><div class="grid" style="margin-bottom:14px"><div class="st"><b>${a.length}</b>Saved words</div><div class="st"><b>${due.length}</b>Due for revision</div><div class="st"><b>${hard}</b>Hard words</div><div class="st"><b>${q.n?Math.round(100*q.c/q.n)+"%":"–"}</b>Quiz accuracy</div></div>`+
+ (due.length?`<div class="card">🔔 ${due.length} word${due.length>1?"s are":" is"} ready for revision.<div class="row"><button class="pri" data-a="rev">Start revision</button></div></div>`:"")+
+ `<div class="card"><h3 style="margin-top:0">Recently saved</h3>${last.map(w=>`<span class="pill" data-lk="${esc(w.word.toLowerCase())}">${esc(w.word)}</span>`).join("")||`<span class="mute">Nothing saved yet. Search a word and tap Save.</span>`}</div><div class="row"><button data-go="search">🔍 Word search</button><button data-a="bulkgo">📋 Bulk search</button><button data-go="practice">🎯 Practice</button><button data-go="saved">📚 Saved</button></div>`}
+function vSearch(){const body=sm==="bulk"?vBulk():!P?"":P.loading?`<div class="card mute">Looking up “${esc(P.word)}”…</div>`:P.err?`<div class="card">${esc(P.err)}</div>`:vProf(P);
+ return`<h2>Word Search</h2><div class="card"><div class="row" style="margin:0"><span class="pill ${sm==="one"?"on":""}" data-sm="one">Single word</span><span class="pill ${sm==="bulk"?"on":""}" data-sm="bulk">Bulk words</span><span class="grow"></span>${langs()}</div>${sm==="one"?`<div class="row"><input id="sq" class="grow" placeholder="Type a word…" value="${esc(sq)}" autocapitalize="off" autocomplete="off"><button data-a="mic" title="Voice search">🎤</button><button class="pri" data-a="go">Search</button></div>`:`<textarea id="bq" placeholder="Paste words separated by commas or new lines">${esc(B?B.raw:"")}</textarea><div class="row"><button class="pri" data-a="bgo">Search all</button></div>`}${cfg.lang==="en"?"":`<p class="mute">Roman Urdu is not available, because there is no reliable free transliteration service.</p>`}</div>`+body}
+function vBulk(){if(!B||!B.items)return"";const d=B.items.filter(x=>x.s!=="load").length;
+ return`<div class="card"><div class="bar"><i style="width:${Math.round(100*d/B.items.length)}%"></i></div><div class="mute">${d} of ${B.items.length} searched</div><div class="row"><button class="sm" data-a="bsall">Save all found</button><button class="sm" data-a="bcall">Copy all</button><button class="sm" data-a="bex">Export JSON</button></div></div>`+B.items.map((x,i)=>`<div class="card"><div class="row" style="margin:0"><b style="font-size:20px">${esc(x.w)}</b><span class="grow"></span>${x.s==="ok"?`<button class="sm" data-a="bc" data-i="${i}">Copy</button><button class="sm pri" data-a="bs" data-i="${i}">Save</button>`:""}${x.s==="err"?`<button class="sm" data-a="br" data-i="${i}">Retry</button>`:""}</div>${x.s==="load"?`<div class="mute">Searching…</div>`:x.s==="err"?`<div class="mute">${esc(x.e)}</div>`:vProf(x.L,true).replace(/^<div class="card">/,"<div>").replace(/<div class="row" style="margin:0">.*?<\/div><div class="mute">/,'<div class="mute">')+`<div class="mute">Synonyms: ${esc(x.L.syn.join(", ")||"–")} · Antonyms: ${esc(x.L.ant.join(", ")||"–")}</div>`}</div>`).join("")}
+async function bulkRun(idx){for(const i of idx){const x=B.items[i];x.s="load";render();try{x.L=await prof(x.w,false);x.s=x.L.found||x.L.syn.length?"ok":"err";x.e="Not found. Check the spelling."}catch(e){x.s="err";x.e="Could not reach the services. Try Retry."}render()}}
+/* saving */
+function toCard(L){const fam=L.meanings.slice(0,4).map(m=>({w:L.word,pos:m.pos,pron:ipa(L.phon),meaning:(m.defs[0]||{}).d||"",ex:(m.defs.find(d=>d.ex)||{}).ex||""}));let p={word:cap(L.word),pron:ipa(L.phon),root:String(L.ety||"").slice(0,140),meaning:(fam[0]||{}).meaning||"",syn:L.syn.slice(0,8).join(", "),ant:L.ant.slice(0,6).join(", "),sentences:fam.map(f=>f.ex).filter(Boolean).slice(0,3).join("\n"),family:fam};
+ if(cfg.lang!=="en"&&p.meaning&&TC[cfg.lang+"|"+p.meaning])p.translations=(cfg.lang==="hi"?"Hindi: ":"Telugu: ")+TC[cfg.lang+"|"+p.meaning];
+ p=Object.fromEntries(Object.entries(p).filter(([k,v])=>Array.isArray(v)?v.length:v!==""));const dup=live().find(w=>w.word.toLowerCase()===L.word.toLowerCase());
+ if(dup){const ex=dup.family||[];p.family=[...ex,...(p.family||[]).filter(r=>!ex.some(x=>x.w.toLowerCase()===r.w.toLowerCase()&&(x.pos||"")===(r.pos||"")))];if(dup.translations)delete p.translations}return Object.assign({box:0,due:0},dup||{},p,{id:dup?dup.id:nid()})}
+const prof2txt=L=>cap(L.word)+" "+ipa(L.phon)+"\n"+L.meanings.map(m=>m.pos+": "+m.defs.slice(0,3).map((d,i)=>(i+1)+". "+d.d).join(" ")).join("\n")+"\nSynonyms: "+L.syn.join(", ")+"\nAntonyms: "+L.ant.join(", ");
+/* saved */
+function vSaved(){const s=sq2.toLowerCase(),cols=[...new Set(live().flatMap(w=>csv(w.tags).map(t=>t.toLowerCase())))].sort();
+ const L=live().filter(w=>(!s||JSON.stringify(w).toLowerCase().includes(s))&&(fl==="all"||(fl==="fav"?w.fav:fl==="hard"?(w.miss||0)>=2:csv(w.tags).map(t=>t.toLowerCase()).includes(fl)))).sort((a,b)=>a.word.localeCompare(b.word));
+ return`<h2>Saved Words</h2><div class="card"><input id="fq" placeholder="Search ${live().length} saved words…" value="${esc(sq2)}"><div style="margin-top:10px">${[["all","All"],["fav","⭐ Favourites"],["hard","🔥 Hard"],...cols.map(c=>[c,"#"+c])].map(([k,l])=>`<span class="pill ${fl===k?"on":""}" data-fl="${esc(k)}">${esc(l)}</span>`).join("")}</div><div class="row"><button class="sm" data-a="exp">⬇ Export</button><button class="sm" data-a="imp">⬆ Import</button><button class="sm" data-a="print">🖨 Print</button></div><div class="mute">${esc(note)}</div></div>`+
+ (L.map(w=>{const o=open.has(w.id),m=(w.meaning||"").split("\n")[0];return`<div class="card"><div class="row" style="margin:0;cursor:pointer" data-op="${w.id}"><b style="font-size:19px">${esc(w.word)}</b>${w.roman?`<span class="mute">${esc(w.roman)}</span>`:""}<span class="grow"></span><span data-fav="${w.id}">${w.fav?"⭐":"☆"}</span> ▾</div>${m&&!o?`<div class="mute">${esc(m)}</div>`:""}${o?`<div class="mute">${esc(w.pron||"")}${w.root?" · "+esc(w.root):""}</div>`+(w.meaning?`<div>${esc(w.meaning)}</div>${T(w.meaning)}`:"")+(w.family||[]).filter(f=>f.w).map(f=>`<div class="def"><b>${esc(f.w)}</b> <span class="tg">${esc(f.pos||"")}</span> ${spk(f.w)}<span class="mute">${esc(f.pron||"")}${f.roman?" · "+esc(f.roman):""}</span><div>${esc(f.meaning||"")}</div>${f.ex?`<div class="ex">“${esc(f.ex)}”</div>`:""}</div>`).join("")+
+  (w.translations?`<h3>Translations</h3><div style="white-space:pre-wrap">${esc(w.translations)}</div>`:"")+(w.syn?`<h3>Synonyms</h3>${csv(w.syn).map(x=>`<span class="pill ok" data-lk="${esc(x)}">${esc(x)}</span>`).join("")}`:"")+(w.ant?`<h3>Antonyms</h3>${csv(w.ant).map(x=>`<span class="pill bad" data-lk="${esc(x)}">${esc(x)}</span>`).join("")}`:"")+(w.context?`<h3>Context</h3><div>${esc(w.context)}</div>`:"")+(w.confuse?`<h3>Don’t confuse with</h3><div>${esc(w.confuse)}</div>`:"")+(w.sentences?`<h3>Examples</h3><div style="white-space:pre-wrap">${esc(w.sentences)}</div>`:"")+
+  `<h3>My notes</h3><textarea data-note="${w.id}" placeholder="Write your own notes or sentences…">${esc(w.note||"")}</textarea><h3>Collections (comma separated)</h3><input data-col="${w.id}" value="${esc(w.tags||"")}"><div class="row"><button class="sm" data-say="${esc(w.word)}">🔊</button><button class="sm" data-a="cps" data-id="${w.id}">Copy</button><button class="sm" data-a="del" data-id="${w.id}">Delete</button></div>`:""}</div>`}).join("")||`<p class="mute">No saved words match.</p>`)}
+let sq2="";
+/* practice */
+function pool(){const p=[];live().forEach(w=>{const f=(w.family||[]).filter(x=>x.w&&x.meaning);f.forEach(x=>p.push({w:x.w,m:x.meaning,e:x.ex||"",pos:x.pos||"",h:w.id,hd:x.w.toLowerCase()===w.word.toLowerCase()}));if(!f.some(x=>x.w.toLowerCase()===w.word.toLowerCase())&&w.meaning)p.push({w:w.word,m:w.meaning.split("\n")[0],e:(w.sentences||"").split("\n")[0]||"",pos:"",h:w.id,hd:true})});
+ p.forEach(it=>{const w=words.find(x=>x.id===it.h);if(w&&it.hd){it.s=csv(w.syn);it.a=csv(w.ant)}});return qmode==="rev"?p.filter(it=>{const w=words.find(x=>x.id===it.h);return w&&((w.due||0)<=Date.now()||(w.miss||0)>0)}):p}
+function mkq(it,p){const ks=["def","word"];if(lvl>0){if(it.e&&it.e.toLowerCase().includes(it.w.toLowerCase()))ks.push("blank");if(it.s&&it.s.length)ks.push("syn");if(it.a&&it.a.length)ks.push("ant");if(it.pos)ks.push("pos")}if(lvl>1)ks.push("type","listen");
+ const k=ks[Math.floor(Math.random()*ks.length)],ds=n=>shuffle(p.filter(o=>o!==it&&o.w.toLowerCase()!==it.w.toLowerCase())).slice(0,n);
+ if(k==="syn"||k==="ant"){const l=k==="syn"?it.s:it.a,lc=l.map(x=>x.toLowerCase()),ans={w:l[Math.floor(Math.random()*l.length)]},d=ds(40).filter(o=>!lc.includes(o.w.toLowerCase())).slice(0,3).map(o=>({w:o.w}));if(d.length>=3)return{it,k,ans,opts:shuffle([ans,...d])}}
+ if(k==="pos"){const L=["noun","verb","adjective","adverb"],o=L.map(x=>({w:x}));return{it,k,ans:o.find(x=>x.w===it.pos)||o[0],opts:o}}
+ if(k==="type"||k==="listen")return{it,k,opts:[]};
+ return{it,k:k==="syn"||k==="ant"?"def":k,opts:shuffle([it,...ds(3)])}}
+function grade(it,ok){const w=words.find(x=>x.id===it.h),s=JD("wc3q",{c:0,n:0});s.n++;if(ok)s.c++;SV("wc3q",s);if(!w)return;if(ok){w.box=Math.min((w.box||0)+1,6);w.due=Date.now()+STEPS[w.box]*DAY;if(w.miss)w.miss--}else{w.box=0;w.due=Date.now()+6e5;w.miss=(w.miss||0)+1}put(w)}
+function vPractice(){
+ if(!Q){const n=pool().length;return`<h2>Quiz &amp; Practice</h2><div class="card"><h3 style="margin-top:0">Level</h3>${["Beginner","Intermediate","Advanced"].map((l,i)=>`<span class="pill ${lvl===i?"on":""}" data-lvl="${i}">${l}</span>`).join("")}<h3>Words</h3><span class="pill ${qmode==="all"?"on":""}" data-qm="all">All saved words</span><span class="pill ${qmode==="rev"?"on":""}" data-qm="rev">Revision (due and hard words)</span><p class="mute">${n} items available. Beginner: meanings. Intermediate adds synonyms, antonyms, word type and fill-in-the-blank. Advanced adds typing and listening spelling.</p><div class="row"><button class="pri" data-a="qs">Start</button></div><div class="mute">${esc(note)}</div></div>`}
+ if(Q.i>=Q.qs.length)return`<div class="card" style="text-align:center"><div class="big">${Q.sc}/${Q.qs.length}</div><p>${Q.sc===Q.qs.length?"Perfect! 🎉":"Missed words come back sooner in revision."}</p>${Q.wr.map(x=>`<div class="def"><b>${esc(x.w)}</b> – ${esc(x.m)}</div>`).join("")}<div class="row"><button class="pri" data-a="qs">New quiz</button><button data-a="qq">Done</button></div></div>`;
+ const c=Q.qs[Q.i],it=c.it,k=c.k,ask={def:`What does <b>${esc(it.w)}</b> mean?`,word:`Which word means: <i>${esc(it.m)}</i>`,syn:`Which word is closest in meaning to <b>${esc(it.w)}</b>?`,ant:`Which word is the opposite of <b>${esc(it.w)}</b>?`,pos:`What type of word is <b>${esc(it.w)}</b> in: <i>${esc(it.m)}</i>`,blank:`Fill in the blank:<br><i>“${esc(it.e.replace(new RegExp(it.w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i"),"_____"))}”</i>`,type:`Type the word that means:<br><i>${esc(it.m)}</i><br><span class="mute">Hint: ${esc(it.w[0])}${" _".repeat(Math.max(0,it.w.length-1))}</span>`,listen:`Listen, then type the word you hear. <button class="spk" data-say="${esc(it.w)}">🔊</button>`}[k];
+ const inp=k==="type"||k==="listen",done=Q.sel!==null,right=c.ans||it;
+ const opts=inp?(done?`<div class="opt ${Q.ok?"ok":"bad"}">Your answer: ${esc(Q.ty)}</div>`:`<input id="ta" placeholder="Type here" autocapitalize="off" autocomplete="off" style="margin-top:8px"><div class="row"><button class="pri" data-a="qc">Check</button><button data-a="qk">Show answer</button></div>`):c.opts.map((o,i)=>`<button class="opt ${done?(o===right?"ok":i===Q.sel?"bad":""):""}" data-o="${i}" ${done?"disabled":""}>${esc(k==="def"?o.m:o.w)}</button>`).join("");
+ return`<div class="mute">Question ${Q.i+1} of ${Q.qs.length}</div><div class="bar"><i style="width:${100*Q.i/Q.qs.length}%"></i></div><div class="card"><div style="font-size:19px">${ask}</div>${opts}${done?`<div style="margin-top:12px"><b>${Q.ok?"Correct ✅":"Not quite ❌"}</b> The answer is <b>${esc(inp||k==="def"?it.w:right.w)}</b>${k==="def"?"":""}.<div class="def"><b>${esc(it.w)}</b> – ${esc(it.m)}${T(it.m)}${it.e?`<div class="ex">“${esc(it.e)}” ${spk(it.e)}</div>`:""}</div><div class="row"><button class="pri" data-a="qn">${Q.i+1>=Q.qs.length?"See score":"Next"}</button></div></div>`:""}</div><button class="sm" data-a="qq">Quit</button>`}
+function vSet(){return`<h2>Settings</h2><div class="card"><h3 style="margin-top:0">Translation language</h3>${langs()}<h3>Appearance</h3>${[["auto","Auto"],["light","Light"],["dark","Dark"]].map(([k,l])=>`<span class="pill ${cfg.theme===k?"on":""}" data-th="${k}">${l}</span>`).join("")}<h3>Voice accent</h3>${[["en-IN","India"],["en-US","US"],["en-GB","UK"]].map(([k,l])=>`<span class="pill ${cfg.voice===k?"on":""}" data-vo="${k}">${l}</span>`).join("")}<h3>Speed</h3>${[["0.7","Slow"],["0.9","Normal"],["1.1","Fast"]].map(([k,l])=>`<span class="pill ${cfg.rate===k?"on":""}" data-ra="${k}">${l}</span>`).join("")}<div class="row"><button class="sm" data-say="vocabulary">🔊 Test voice</button></div></div><div class="card"><h3 style="margin-top:0">Your data</h3><p class="mute">${live().length} words saved on this device and available offline.</p><div class="row"><button class="sm" data-a="exp">⬇ Export file</button><button class="sm" data-a="imp">⬆ Import file</button><button class="sm" data-a="cpbk">📋 Copy backup text</button></div><textarea id="rb" placeholder="Paste backup text here to restore…" style="margin-top:10px"></textarea><div class="row"><button class="sm pri" data-a="rbk">Restore</button></div><div class="mute">${esc(note)}</div></div>`}
+function render(){$("sb").innerHTML=`<h1>📚 <span>My Word Cards</span></h1>`+NAV.map(([k,i,l])=>`<button class="nb ${k===tab?"on":""}" data-go="${k}">${i}<span>${l}</span></button>`).join("")+`<button class="nb" data-a="mini">↔<span>Collapse</span></button>`;
+ $("bn").innerHTML=NAV.map(([k,i,l])=>`<button class="${k===tab?"on":""}" data-go="${k}"><span>${i}</span>${l.replace("Word ","").replace(" Words","")}</button>`).join("");
+ $("main").innerHTML={home:vHome,search:vSearch,practice:vPractice,saved:vSaved,set:vSet}[tab]()}
+/* events */
+function dl(n,t){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"application/json"}));a.download=n;document.body.appendChild(a);a.click();a.remove()}
+async function dlf(n,t){try{if(typeof claude!=="undefined"){const d=await claude.use("downloads");if(d){await d.save({filename:n,data:t});return}}}catch(e){}dl(n,t)}
+function startQ(){const p=pool();if(p.length<(lvl>1?1:4)){note="Not enough saved words with meanings yet (need at least 4, or 1 for Advanced).";render();return}Q={i:0,sc:0,wr:[],sel:null,ok:false,ty:"",qs:shuffle(p).slice(0,10).map(it=>mkq(it,p))};render()}
+function fin(ok){const c=Q.qs[Q.i];Q.ok=ok;if(ok)Q.sc++;else Q.wr.push(c.it);grade(c.it,ok)}
+document.addEventListener("click",async e=>{const t=e.target.closest("[data-go],[data-lk],[data-a],[data-rel],[data-lang],[data-sm],[data-say],[data-aud],[data-o],[data-lvl],[data-qm],[data-fl],[data-op],[data-fav],[data-th],[data-vo],[data-ra]");if(!t)return;const D=t.dataset;
+ if(D.aud)return aud(D.aud,D.say);if(D.say)return say(D.say);if(D.lk)return lookup(D.lk);if(D.go){tab=D.go;if(tab==="practice"){Q=null;note=""}return render(),scrollTo(0,0)}
+ if(D.lang){cfg.lang=D.lang;SV("wc2c",cfg);return render()}if(D.sm){sm=D.sm;return render()}if(D.lvl){lvl=+D.lvl;return render()}if(D.qm){qmode=D.qm;return render()}if(D.fl){fl=D.fl;return render()}
+ if(D.th){cfg.theme=D.th;SV("wc2c",cfg);theme();return render()}if(D.vo){cfg.voice=D.vo;SV("wc2c",cfg);return render()}if(D.ra){cfg.rate=D.ra;SV("wc2c",cfg);return render()}
+ if(D.op){open.has(D.op)?open.delete(D.op):open.add(D.op);return render()}if(D.fav){e.stopPropagation();const w=words.find(x=>x.id===D.fav);if(w){w.fav=!w.fav;return put(w)}return}
+ if(D.rel){const w=D.rel;if(RO.has(w))RO.delete(w);else{RO.add(w);if(!RC[w]){render();try{const a=await jget("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(w));RC[w]=pd(a)}catch(x){RC[w]="x"}}}return render()}
+ if(D.o!==undefined){if(Q.sel!==null)return;const c=Q.qs[Q.i];Q.sel=+D.o;return fin(c.opts[Q.sel]===(c.ans||c.it)),render()}
+ const a=D.a;
+ if(a==="go"||a==="hs"){return lookup(a==="hs"?$("hq").value:$("sq").value)}
+ else if(a==="mic"){const S=window.SpeechRecognition||window.webkitSpeechRecognition;if(!S)return toast("Voice search is not supported in this browser");const r=new S();r.lang="en-US";r.onresult=ev=>lookup(ev.results[0][0].transcript.replace(/[.,!?]/g,""));r.onerror=()=>toast("Microphone unavailable or permission denied");try{r.start();toast("Listening…")}catch(x){toast("Could not start the microphone")}}
+ else if(a==="sv"){put(toCard(P));toast("Saved ✓")}
+ else if(a==="cpw")cp(prof2txt(P));
+ else if(a==="bulkgo"){tab="search";sm="bulk";render()}
+ else if(a==="bgo"){const l=[...new Set($("bq").value.split(/[,\n]+/).map(x=>x.trim().toLowerCase()).filter(Boolean))];if(!l.length)return;B={raw:l.join("\n"),items:l.map(w=>({w,s:"load"}))};render();bulkRun(l.map((_,i)=>i))}
+ else if(a==="br")bulkRun([+D.i]);
+ else if(a==="bs"){put(toCard(B.items[+D.i].L));toast("Saved ✓")}
+ else if(a==="bc")cp(prof2txt(B.items[+D.i].L));
+ else if(a==="bsall"){B.items.filter(x=>x.s==="ok").forEach(x=>put(toCard(x.L)));toast("Saved ✓")}
+ else if(a==="bcall")cp(B.items.filter(x=>x.s==="ok").map(x=>prof2txt(x.L)).join("\n\n"));
+ else if(a==="bex")dlf("bulk-results.json",JSON.stringify(B.items.filter(x=>x.s==="ok").map(x=>x.L),null,2));
+ else if(a==="cps"){const w=words.find(x=>x.id===D.id);cp([w.word+" "+(w.pron||""),w.meaning||"",w.translations||"","Synonyms: "+(w.syn||""),"Antonyms: "+(w.ant||"")].join("\n"))}
+ else if(a==="del"){if(confirm("Delete this word?"))put({id:D.id,deleted:true})}
+ else if(a==="exp"){await dlf("my-word-cards.json",JSON.stringify(live(),null,2))}
+ else if(a==="imp")$("imp").click();else if(a==="print")print();
+ else if(a==="cpbk")cp(JSON.stringify(live()));
+ else if(a==="rbk"){try{const l=JSON.parse($("rb").value.trim());if(!Array.isArray(l)||l.some(w=>!w.id||!w.word))throw 0;l.forEach(w=>w.u=Date.now());mergeIn(l);note="Restored "+l.length+" words (duplicates merged)."}catch(x){note="That text is not a valid backup."}render()}
+ else if(a==="rev"){tab="practice";qmode="rev";Q=null;startQ()}
+ else if(a==="qs")startQ();else if(a==="qq"){Q=null;render()}else if(a==="qn"){Q.i++;Q.sel=null;Q.ty="";render()}
+ else if(a==="qc"||a==="qk"){const c=Q.qs[Q.i],v=a==="qc"?($("ta").value||"").trim():"";if(a==="qc"&&!v)return;Q.ty=a==="qk"?"(showed answer)":v;Q.sel=1;fin(a==="qc"&&v.toLowerCase()===c.it.w.toLowerCase());render()}
+ else if(a==="mini")$("app").classList.toggle("mini")});
+document.addEventListener("keydown",e=>{if(e.key!=="Enter")return;const i=e.target.id;if(i==="sq"||i==="hq")lookup(e.target.value);else if(i==="ta"){const b=document.querySelector('[data-a="qc"]');b&&b.click()}});
+document.addEventListener("input",e=>{const t=e.target;if(t.id==="fq"){sq2=t.value;render();const f=$("fq");f.focus();f.setSelectionRange(sq2.length,sq2.length)}else if(t.id==="sq")sq=t.value});
+document.addEventListener("change",e=>{const t=e.target,w=words.find(x=>x.id===(t.dataset.note||t.dataset.col));if(w&&t.dataset.note){w.note=t.value;put(w)}else if(w&&t.dataset.col){w.tags=t.value;put(w)}});
+const imp=document.createElement("input");imp.type="file";imp.id="imp";imp.accept=".json,application/json";imp.className="hide";document.body.appendChild(imp);
+imp.addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const l=JSON.parse(await f.text());if(!Array.isArray(l)||l.some(w=>!w.id||!w.word))throw 0;l.forEach(w=>w.u=Date.now());mergeIn(l);note="Imported "+l.length+" words (duplicates merged)."}catch(x){note="That file is not a valid backup."}e.target.value="";render()});
+(async function(){theme();fixName();render();try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",theme)}catch(e){}
+ if(typeof claude==="undefined")return;try{const u=await claude.use("user"),db=await claude.use("db");if(u&&db){store=db.collection("data/users/"+await u.id());store.onSnapshot(s=>{mergeIn(s.docs.map(d=>d.data()).filter(Boolean));fixName();render()},()=>{store=null})}}catch(e){}})();
 </script><script>if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script>
 </body></html>
