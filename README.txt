@@ -20,3 +20,7 @@ Move words between devices: Settings (gear) > Copy backup text, then Restore on 
 UPDATING THE APP LATER: in your repository click Add file > Upload files, drop the new index.html
 (same name) and Commit. Open the app twice to get the new version.
 Note: the repository is public, but your words are never uploaded. They live only on your devices.
+
+DICTIONARY (new): the Dict tab looks words up online (definitions by word type, pronunciation, synonyms,
+antonyms, a root and relations map). It needs internet when you search. Saved cards always work offline.
+Updating from an older version: upload the new index.html and sw.js (same names), then open the app twice.

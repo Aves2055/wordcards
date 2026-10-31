@@ -62,6 +62,8 @@ label{display:block;font-size:12px;color:var(--mute);margin:12px 0 4px;text-tran
 .rm{color:var(--acc);font-size:13px;font-weight:600}
 :root[data-theme="light"]{color-scheme:light}:root[data-theme="dark"]{color-scheme:dark}
 .pill{margin-bottom:6px}
+.chip.ok{background:var(--okb);border-color:var(--ok)}.chip.bad{background:var(--badb);border-color:var(--bad)}.chip small{opacity:.7}
+.wrapc{flex-wrap:wrap;overflow:visible;padding-top:2px}.def{padding:6px 0}.tabs button{min-width:0}
 .sw{display:inline-block;width:34px;height:34px;border-radius:50%;margin:0 8px 6px 0;border:3px solid transparent;cursor:pointer}.sw.on{border-color:var(--ink)}
 .tagc{display:inline-block;font-size:12px;color:var(--acc);background:var(--accb);border-radius:20px;padding:1px 8px;margin:0 6px 4px 0}.tgs{margin-bottom:6px}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
@@ -84,17 +86,19 @@ label{display:block;font-size:12px;color:var(--mute);margin:12px 0 4px;text-tran
 </style></head>
 <body><div class="wrap">
 <header><h1>📚 My Word Cards</h1><span><span id="status"></span> <button class="spk" data-t="set" title="Settings">⚙️</button></span></header>
-<div id="v-today"></div><div id="v-words" class="hide"></div><div id="v-quiz" class="hide"></div><div id="v-paste" class="hide"></div><div id="v-new" class="hide"></div><div id="v-set" class="hide"></div>
+<div id="v-today"></div><div id="v-words" class="hide"></div><div id="v-dict" class="hide"></div><div id="v-quiz" class="hide"></div><div id="v-paste" class="hide"></div><div id="v-new" class="hide"></div><div id="v-set" class="hide"></div>
 </div>
 <div class="tabs" id="tabs"></div>
 <input type="file" id="imp" accept="application/json,.json" class="hide">
 <script>
-const TABS=[["today","☀️","Today"],["words","📖","Words"],["quiz","🎯","Quiz"],["paste","📋","Paste"],["new","➕","New"]];
+const TABS=[["today","☀️","Today"],["words","📖","Words"],["dict","🔍","Dict"],["quiz","🎯","Quiz"],["paste","📋","Paste"],["new","➕","New"]];
 const TPL=`Egoist
 Pronunciation: /ˈiː.ɡoʊ.ɪst/
 Say it: EE-go-ist
 Root: Latin ego = I
 Tags: personality, behaviour
+Synonyms: selfish, self-centred
+Antonyms: altruist, selfless
 Meaning: A person who puts their own interests above everyone else's.
 Grammar family:
 Egoist (noun) /ˈiː.ɡoʊ.ɪst/ [EE-go-ist] – a person who acts only in their own interest. Example: An egoist rarely thinks of how his choices hurt others.
@@ -148,9 +152,9 @@ async function init(){
   }catch(e){}
 }
 /* ---------- paste parser ---------- */
-const HEAD=/^(tags?|word|heading|title|roman pronunciation|say it|sounds like|pronunciation|root|origin|etymology|grammar family|grammar|word family|family|translations?|meanings?|definitions?|context\s*(?:&|and)?\s*usage|context|usage|don['’]?t confuse(?: with)?|nuance|contextual sentences|example sentences|sentences|examples?)\b\s*[:\-–—]?\s*(.*)$/i;
+const HEAD=/^(tags?|synonyms?|antonyms?|word|heading|title|roman pronunciation|say it|sounds like|pronunciation|root|origin|etymology|grammar family|grammar|word family|family|translations?|meanings?|definitions?|context\s*(?:&|and)?\s*usage|context|usage|don['’]?t confuse(?: with)?|nuance|contextual sentences|example sentences|sentences|examples?)\b\s*[:\-–—]?\s*(.*)$/i;
 function keyOf(h){h=h.toLowerCase();
-  if(/^tag/.test(h))return"tags";if(/^(word|heading|title)/.test(h))return"word";if(/^(roman pron|say it|sounds)/.test(h))return"roman";if(/^pron/.test(h))return"pron";if(/^(root|origin|etym)/.test(h))return"root";
+  if(/^tag/.test(h))return"tags";if(/^syn/.test(h))return"syn";if(/^ant/.test(h))return"ant";if(/^(word|heading|title)/.test(h))return"word";if(/^(roman pron|say it|sounds)/.test(h))return"roman";if(/^pron/.test(h))return"pron";if(/^(root|origin|etym)/.test(h))return"root";
   if(/^(grammar|word family|family)/.test(h))return"family";if(/^transl/.test(h))return"translations";if(/^(mean|defin)/.test(h))return"meaning";
   if(/^(context|usage)/.test(h))return"context";if(/^(don|nuance)/.test(h))return"confuse";return"sentences"}
 function famLine(s){
@@ -175,7 +179,7 @@ function parse(t){
   const j=(k,sep)=>(buf[k]||[]).join(sep||"\n");
   let w=word||(buf.word||[])[0]||"";if(w===w.toUpperCase())w=w.charAt(0)+w.slice(1).toLowerCase();
   const fam=(buf.family||[]).map(famLine).filter(f=>f&&f.w);w=w.replace(/^[\[\(<\s]+|[\]\)>\s]+$/g,"");if(!w||/^word$/i.test(w))w=fam.length?fam[0].w:w;let pr=j("pron"," "),rm=j("roman"," ");if(!rm){const mm=pr.match(/\(([^)]+)\)\s*$/);if(mm){rm=mm[1];pr=pr.replace(mm[0],"").trim()}}
-  return{word:w.trim(),pron:pr,roman:rm,tags:j("tags",", "),root:j("root"," "),meaning:j("meaning"),translations:j("translations"),context:j("context"),confuse:j("confuse"),sentences:j("sentences"),family:fam}
+  return{word:w.trim(),pron:pr,roman:rm,tags:j("tags",", "),syn:j("syn",", "),ant:j("ant",", "),root:j("root"," "),meaning:j("meaning"),translations:j("translations"),context:j("context"),confuse:j("confuse"),sentences:j("sentences"),family:fam}
 }
 /* ---------- card ---------- */
 function famRow(f){return`<div class="fam"><div class="fh"><b>${esc(f.w)}</b><button class="spk" data-say="${esc(f.w)}" title="Listen">🔊</button>${f.pos?`<span class="tag">${esc(f.pos)}</span>`:""}${f.roman?`<span class="rm">${esc(f.roman)}</span>`:""}${f.pron?`<span class="pr">${esc(f.pron)}</span>`:""}</div>${f.meaning?`<div>${esc(f.meaning)}</div>`:""}${f.ex?`<div class="ex">“${esc(f.ex)}”</div>`:""}</div>`}
@@ -186,12 +190,16 @@ function detail(w,id){
   if(w.context)T.push(["ctx","Context & usage"]);
   if(w.confuse)T.push(["cf","Don’t confuse with"]);
   if(w.sentences)T.push(["ex","Example sentences"]);
+  if(fam.length>=2||csv(w.syn).length||csv(w.ant).length)T.push(["map","Root map"]);
+  if(csv(w.syn).length||csv(w.ant).length)T.push(["sa","Synonyms & antonyms"]);
   const cur=T.some(t=>t[0]===SUB[id])?SUB[id]:(T[0]||[])[0];let p="";
   if(cur==="family")p=fam.length?fam.map(famRow).join(""):`<div class="txt">${esc(w.grammar)}</div>`;
   else if(cur==="tr")p=w.translations.split("\n").filter(l=>l.trim()).map(l=>{const m=l.match(/^\s*([^:]{1,24}):\s*(.+)$/);return m?`<div class="tr"><span class="lang">${esc(m[1])}</span><span>${esc(m[2])}</span></div>`:`<div class="tr"><span>${esc(l)}</span></div>`}).join("");
   else if(cur==="ctx")p=`<div class="txt">${esc(w.context)}</div>`;
   else if(cur==="cf")p=`<div class="txt">${esc(w.confuse)}</div>`;
   else if(cur==="ex")p=w.sentences.split("\n").map(l=>l.replace(/^[\s•\-\*\d\.\)]+/,"").trim()).filter(Boolean).map(l=>`<div class="exs"><span>“${esc(l)}”</span><button class="spk" data-say="${esc(l)}" title="Listen">🔊</button></div>`).join("");
+  if(cur==="map")p=diagram(rootLines(stemOf(w.word),w.root),groupsFromCard(w))+`<p class="mute">Tap a word in the map to look it up (needs internet).</p>`;
+  else if(cur==="sa")p=(csv(w.syn).length?`<div class="h3" style="margin-top:0">Synonyms</div><div class="chips wrapc">${csv(w.syn).map(x=>`<span class="chip ok" data-lk="${esc(x)}">${esc(x)}</span>`).join("")}</div>`:"")+(csv(w.ant).length?`<div class="h3">Antonyms</div><div class="chips wrapc">${csv(w.ant).map(x=>`<span class="chip bad" data-lk="${esc(x)}">${esc(x)}</span>`).join("")}</div>`:"");
   const meta=[w.pron,w.root].filter(Boolean).map(esc).join(" · "),mean=w.meaning||w.meanings||"";
   return(tagsOf(w).length?`<div class="tgs">${tagsOf(w).map(t=>`<span class="tagc">#${esc(t)}</span>`).join("")}</div>`:"")+(meta?`<div class="sub">${meta}</div>`:"")+(mean?`<div class="main" style="margin-top:8px">${esc(mean).replace(/\n/g,"<br>")}</div>`:"")+(T.length?`<div class="chips">${T.map(([k,l])=>`<span class="chip ${k===cur?"on":""}" data-sub="${esc(id)}|${k}">${esc(l)}</span>`).join("")}</div><div>${p}</div>`:"")
 }
@@ -226,6 +234,97 @@ function vSet(){
   return`<div class="card"><b>Appearance</b><label>Theme</label><div>${pills("theme",[["auto","Auto"],["light","Light"],["dark","Dark"]])}</div><label>Accent colour</label><div>${sw}</div><label>Text size</label><div>${pills("fs",[["0.9","Small"],["1","Normal"],["1.15","Large"],["1.3","Extra large"]])}</div></div>
 <div class="card"><b>Learning</b><label>New words per day (goal)</label><div class="bar"><button class="sm" data-a="gminus">−</button><b style="min-width:30px;text-align:center">${cfg.goal}</b><button class="sm" data-a="gplus">+</button><span class="mute">0 turns the goal off</span></div><label>Pronunciation accent</label><div>${pills("voice",[["en-IN","India"],["en-US","US"],["en-GB","UK"]])}</div><label>Speaking speed</label><div>${pills("rate",[["0.7","Slow"],["0.85","Normal"],["1","Fast"]])}</div><div class="row"><button class="sm" data-say="egoist">🔊 Test voice</button></div></div>
 <div class="card"><b>Your data</b><p class="mute">${live().length} cards saved on this device. Last backup: ${lb?new Date(lb).toLocaleDateString():"never"}.</p><div class="row"><button class="sm" data-a="exp">⬇ Export file</button><button class="sm" data-a="imp">⬆ Import file</button><button class="sm" data-a="cpbk">📋 Copy backup text</button></div><label>Restore: paste backup text here</label><textarea id="rb" placeholder="Paste backup text from your other device…"></textarea><div class="row"><button class="sm pri" data-a="rbk">Restore</button></div><div class="mute" style="margin-top:8px">${esc(note)}</div></div>`}
+const csv=s=>String(s||"").split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean);
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const POSN={n:"Noun",v:"Verb",adj:"Adjective",adv:"Adverb"};
+const posName=p=>{p=String(p||"").toLowerCase();return POSN[p]||(p?cap(p):"Other")};
+const ipa=t=>t?"/"+String(t).replace(/^\/|\/$/g,"")+"/":"";
+let LK=null,dq="",selFam=new Set();
+const recents=()=>{try{return JSON.parse(lget("wc2r")||"[]")}catch(e){return[]}};
+function addRecent(w){const r=[w,...recents().filter(x=>x!==w)].slice(0,12);try{localStorage.setItem("wc2r",JSON.stringify(r))}catch(e){}}
+const SUF=["istically","ically","istic","ation","ition","ality","ness","ment","ical","ious","less","ful","ism","ist","ity","ous","ive","ize","ise","ing","est","ly","ed","er","ic","al","s","y"].sort((a,b)=>b.length-a.length);
+function stemOf(w){w=String(w).toLowerCase();for(const s of SUF)if(w.endsWith(s)&&w.length-s.length>=3)return w.slice(0,w.length-s.length);return w}
+async function jget(u){const r=await fetch(u);if(!r.ok)throw new Error(String(r.status));return r.json()}
+const dm=q=>jget("https://api.datamuse.com/words?"+q);
+function parseDict(arr){
+  const L={phon:"",audio:"",meanings:[],syn:[],ant:[],ety:""},M={};
+  arr.forEach(e=>{
+    if(!L.phon)L.phon=e.phonetic||((e.phonetics||[]).find(p=>p.text)||{}).text||"";
+    if(!L.audio){const a=(e.phonetics||[]).find(p=>p.audio);if(a)L.audio=a.audio.startsWith("//")?"https:"+a.audio:a.audio}
+    if(!L.ety&&e.origin)L.ety=e.origin;
+    (e.meanings||[]).forEach(m=>{const g=M[m.partOfSpeech||"other"]||(M[m.partOfSpeech||"other"]={pos:m.partOfSpeech||"other",defs:[]});
+      (m.definitions||[]).forEach(d=>{g.defs.push({d:d.definition,ex:d.example||""});(d.synonyms||[]).forEach(x=>L.syn.push(x));(d.antonyms||[]).forEach(x=>L.ant.push(x))});
+      (m.synonyms||[]).forEach(x=>L.syn.push(x));(m.antonyms||[]).forEach(x=>L.ant.push(x))})});
+  L.meanings=Object.values(M);return L}
+async function famOf(word,stem){
+  const r=await dm("sp="+encodeURIComponent(stem)+"*&md=p&max=80"),seen=new Set([word]),out=[];
+  r.forEach(x=>{const w=String(x.word||"").toLowerCase();if(!/^[a-z-]+$/.test(w)||seen.has(w)||!w.startsWith(stem)||w.length>word.length+8)return;seen.add(w);out.push({w,pos:(x.tags||[]).find(t=>POSN[t])||""})});
+  return out.filter(f=>!(f.w.endsWith("s")&&(seen.has(f.w.slice(0,-1))||f.w.slice(0,-1)===word))).slice(0,16)}
+async function etyOf(word){
+  const j=await jget("https://en.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&format=json&origin=*&titles="+encodeURIComponent(word));
+  const pg=Object.values((j.query||{}).pages||{})[0],t=(pg&&pg.extract)||"";
+  const eng=t.split(/(?:^|\n)==\s*English\s*==\s*\n/)[1]||"",sec=eng.split(/\n==\s*[^=\n]+==\s*\n/)[0]||eng;
+  const m=sec.match(/===\s*Etymology[^=\n]*===\s*\n([\s\S]*?)(?=\n===|$)/);
+  return m?m[1].trim().split("\n")[0].slice(0,300):""}
+async function lookup(word){
+  word=String(word||"").trim().toLowerCase();if(!word)return;
+  dq=word;LK={word,loading:true};selFam=new Set();tab="dict";render();scrollTo(0,0);
+  const stem=stemOf(word);
+  const [d,fam,sy,an,et]=await Promise.allSettled([jget("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(word)),famOf(word,stem),dm("rel_syn="+encodeURIComponent(word)+"&max=12"),dm("rel_ant="+encodeURIComponent(word)+"&max=10"),etyOf(word)]);
+  if([d,fam,sy,an].every(x=>x.status!=="fulfilled")){LK={word,err:"Could not reach the dictionary. Check your internet. Lookups work in the installed or downloaded app, but not inside the Claude link, because that page cannot contact other sites."};render();return}
+  const L=d.status==="fulfilled"&&Array.isArray(d.value)?parseDict(d.value):{phon:"",audio:"",meanings:[],syn:[],ant:[],ety:""};
+  if(sy.status==="fulfilled")sy.value.forEach(x=>L.syn.push(x.word));if(an.status==="fulfilled")an.value.forEach(x=>L.ant.push(x.word));
+  const uq=a=>[...new Set(a.map(x=>String(x).toLowerCase()).filter(x=>x&&x!==word))];
+  L.syn=uq(L.syn).slice(0,14);L.ant=uq(L.ant).slice(0,10);L.word=word;L.stem=stem;L.fam=fam.status==="fulfilled"?fam.value:[];
+  if(et.status==="fulfilled"&&et.value)L.ety=et.value;
+  if(!L.meanings.length&&!L.syn.length&&!L.fam.length){LK={word,err:"“"+word+"” was not found. Check the spelling."};render();return}
+  LK=L;addRecent(word);render()}
+function wrap(t,n){const o=[];let c="";String(t).split(/\s+/).forEach(w=>{if((c+" "+w).trim().length>n&&c){o.push(c);c=w}else c=(c+" "+w).trim()});if(c)o.push(c);return o}
+function rootLines(stem,ety){const m=String(ety||"").match(/\b(?:from|Latin|Greek|French|German|Old English|Middle English|Arabic|Sanskrit|Italian|Spanish)\b[^.;:]{0,70}/i),l=["ROOT",stem+"-"];
+  const t=m?m[0]:String(ety||"").slice(0,42);if(t)wrap(t,14).slice(0,3).forEach(x=>l.push(x));return l}
+function mkGroups(g,syn,ant){const o=["Noun","Verb","Adjective","Adverb"],ks=[...o.filter(k=>g[k]),...Object.keys(g).filter(k=>!o.includes(k))],out=ks.map(k=>({label:k,cls:"fam",words:g[k]}));
+  if(syn.length)out.push({label:"Synonyms",cls:"syn",words:syn.map(w=>({w}))});if(ant.length)out.push({label:"Antonyms",cls:"ant",words:ant.map(w=>({w}))});return out}
+function groupsFromCard(w){const g={};(w.family||[]).filter(f=>f.w).forEach(f=>{const k=posName(f.pos);(g[k]=g[k]||[]).push({w:f.w,self:f.w.toLowerCase()===w.word.toLowerCase()})});return mkGroups(g,csv(w.syn),csv(w.ant))}
+function groupsFromLK(L){const g={},add=(p,w,self)=>{const k=posName(p);(g[k]=g[k]||[]).push({w,self})};L.meanings.forEach(m=>add(m.pos,L.word,true));L.fam.slice(0,12).forEach(f=>add(f.pos,f.w));return mkGroups(g,L.syn.slice(0,8),L.ant.slice(0,6))}
+function diagram(lines,groups){
+  const RH=30,P=10,C={fam:["var(--accb)","var(--acc)"],syn:["var(--okb)","var(--ok)"],ant:["var(--badb)","var(--bad)"]},rows=[];let y=P;
+  groups.forEach(g=>{const ws=g.words.slice(0,9);if(!ws.length)return;rows.push({g,ws,top:y,bot:y+ws.length*RH});y+=ws.length*RH});
+  if(!rows.length)return"";
+  const rh=lines.length*16+14,H=Math.max(y+P,rh+20),cy=H/2;
+  let s=`<svg viewBox="0 0 360 ${H}" style="width:100%;max-width:520px;display:block;margin:0 auto" role="img" aria-label="Word relation diagram"><rect x="2" y="${cy-rh/2}" width="96" height="${rh}" rx="12" style="fill:var(--acc)"/>`+
+   lines.map((t,i)=>`<text x="50" y="${cy-rh/2+19+i*16}" text-anchor="middle" style="font-size:${i===1?15:10}px;font-weight:${i===1?700:400};fill:var(--on)">${esc(t)}</text>`).join("");
+  rows.forEach(r=>{const gy=(r.top+r.bot)/2,c=C[r.g.cls];
+    s+=`<path d="M98 ${cy} C 110 ${cy},110 ${gy},122 ${gy}" style="fill:none;stroke:${c[1]};stroke-width:1.5"/><rect x="122" y="${gy-13}" width="88" height="26" rx="13" style="fill:${c[1]}"/><text x="166" y="${gy+4}" text-anchor="middle" style="font-size:11px;font-weight:700;fill:var(--on)">${esc(r.g.label)}</text>`;
+    r.ws.forEach((w,i)=>{const wy=r.top+i*RH+RH/2,t=w.w.length>15?w.w.slice(0,14)+"…":w.w;
+      s+=`<path d="M210 ${gy} C 221 ${gy},221 ${wy},232 ${wy}" style="fill:none;stroke:${c[1]};stroke-width:1.2;opacity:.6"/><g data-lk="${esc(w.w)}" style="cursor:pointer"><rect x="232" y="${wy-12}" width="124" height="24" rx="12" style="fill:${w.self?c[1]:c[0]};stroke:${c[1]}"/><text x="294" y="${wy+4}" text-anchor="middle" style="font-size:12.5px;fill:${w.self?"var(--on)":"var(--ink)"}">${esc(t)}</text></g>`})});
+  return s+"</svg>"}
+function playAud(u,w){try{const a=new Audio(u);a.onerror=()=>say(w);const p=a.play();if(p&&p.catch)p.catch(()=>say(w))}catch(e){say(w)}}
+function vLK(L){
+  const mine=live().find(w=>w.word.toLowerCase()===L.word.toLowerCase()),chip=(w,c)=>`<span class="chip ${c||""}" data-lk="${esc(w)}">${esc(w)}</span>`;
+  const mean=L.meanings.map(m=>`<div class="h3">${esc(posName(m.pos))}</div>`+m.defs.slice(0,4).map((d,i)=>`<div class="def"><b>${i+1}.</b> ${esc(d.d)}${d.ex?`<div class="ex">“${esc(d.ex)}” <button class="spk" data-say="${esc(d.ex)}">🔊</button></div>`:""}</div>`).join("")).join("")||`<p class="mute">No dictionary definition found. Related words are shown below.</p>`;
+  const groups=groupsFromLK(L),svg=diagram(rootLines(L.stem,L.ety),groups);
+  return`<div class="card"><div class="head"><div><div class="word">${esc(L.word)} <button class="spk" ${L.audio?`data-aud="${esc(L.audio)}" `:""}data-say="${esc(L.word)}" title="Listen">🔊</button></div><div class="sub">${esc(ipa(L.phon))}${mine&&mine.roman?` · Say it: ${esc(mine.roman)}`:""}</div></div>${mine?`<span class="tagc">✓ in your cards</span>`:""}</div>${mean}</div>`+
+  (L.syn.length||L.ant.length?`<div class="card">${L.syn.length?`<div class="h3" style="margin-top:0">Synonyms</div><div class="chips wrapc">${L.syn.map(w=>chip(w,"ok")).join("")}</div>`:""}${L.ant.length?`<div class="h3">Antonyms</div><div class="chips wrapc">${L.ant.map(w=>chip(w,"bad")).join("")}</div>`:""}</div>`:"")+
+  (svg?`<div class="card"><div class="h3" style="margin-top:0">Root &amp; relations map</div>${svg}<p class="mute">Tap any word in the map to look it up.</p>${L.ety?`<div class="h3">Origin</div><div class="txt mute">${esc(L.ety)}</div>`:""}</div>`:"")+
+  (L.fam.length?`<div class="card"><div class="h3" style="margin-top:0">Possible relatives (same stem “${esc(L.stem)}”)</div><p class="mute">Found by spelling, so check them. Tap to select the ones you want on the card.</p><div class="chips wrapc">${L.fam.map(f=>`<span class="chip ${selFam.has(f.w)?"on":""}" data-fs="${esc(f.w)}">${selFam.has(f.w)?"✓ ":"+ "}${esc(f.w)}${f.pos?` <small>${esc(f.pos)}</small>`:""}</span>`).join("")}</div></div>`:"")+
+  (L.added?`<div class="card">✅ Saved to your cards.<div class="row"><button class="sm pri" data-a="dopen">Open card</button><button class="sm" data-a="dai">Add Hindi / Urdu / Telugu with AI</button></div></div>`:`<div class="row"><button class="pri" data-a="dadd">➕ Add to my cards${selFam.size?" (+"+selFam.size+" relatives)":""}</button></div><div class="mute" style="margin-top:6px">${esc(note)}</div>`)}
+function vDict(){
+  const rec=recents().map(w=>`<span class="chip" data-lk="${esc(w)}">${esc(w)}</span>`).join("");
+  const body=!LK?"":LK.loading?`<div class="card mute">Looking up “${esc(LK.word)}”…</div>`:LK.err?`<div class="card">${esc(LK.err)}</div>`:vLK(LK);
+  return`<div class="card"><b>Dictionary</b><p class="mute">Search any English word: meanings by word type, pronunciation, synonyms, antonyms, and a map of related words.</p><div class="bar"><input id="dq" placeholder="e.g. egoist" value="${esc(dq)}" autocapitalize="off" autocomplete="off"><button class="pri" data-a="dsearch">Search</button></div>${rec?`<div class="chips wrapc">${rec}</div>`:""}</div>`+body}
+async function addLK(){
+  const L=LK;if(!L||!L.word)return;note="Adding…";render();
+  const rel=[...selFam].slice(0,8),pn=p=>posName(p)==="Other"?"":posName(p).toLowerCase();
+  const first=L.meanings.slice(0,4).map(m=>({w:L.word,pos:m.pos,pron:ipa(L.phon),meaning:(m.defs[0]||{}).d||"",ex:((m.defs.find(d=>d.ex))||{}).ex||""}));
+  const more=await Promise.all(rel.map(async w=>{const pos=pn((L.fam.find(f=>f.w===w)||{}).pos);try{const D=parseDict(await jget("https://api.dictionaryapi.dev/api/v2/entries/en/"+encodeURIComponent(w))),m=D.meanings[0]||{defs:[]};return{w,pos:m.pos||pos,pron:ipa(D.phon),meaning:(m.defs[0]||{}).d||"",ex:((m.defs.find(d=>d.ex))||{}).ex||""}}catch(e){return{w,pos,pron:"",meaning:"",ex:""}}}));
+  let fam=[...first,...more];if(!fam.length)fam=[{w:L.word,pos:"",pron:ipa(L.phon),meaning:"",ex:""}];
+  const exs=fam.map(f=>f.ex).filter(Boolean).slice(0,3).join("\n");
+  let p={word:cap(L.word),pron:ipa(L.phon),root:String(L.ety||"").slice(0,140),meaning:(fam.find(f=>f.meaning)||{}).meaning||"",syn:L.syn.slice(0,8).join(", "),ant:L.ant.slice(0,6).join(", "),sentences:exs,family:fam};
+  p=Object.fromEntries(Object.entries(p).filter(([k,v])=>Array.isArray(v)?v.length:v!==""));
+  const dup=live().find(w=>w.word.toLowerCase()===L.word.toLowerCase());
+  if(dup){const ex=dup.family||[];p.family=[...ex,...p.family.filter(r=>!ex.some(x=>x.w.toLowerCase()===r.w.toLowerCase()&&(x.pos||"")===(r.pos||"")))]}
+  const w=Object.assign({box:0,due:0},dup||{},p,{id:dup?dup.id:nid()});
+  note="";if(LK===L)L.added=w.id;await put(w)}
 const day=o=>new Date(Date.now()-o*864e5-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 function st(){try{return JSON.parse(localStorage.getItem("wc2s")||"{}")}catch(e){return{}}}
 function bump(){const s=st(),t=day(0);if(s.d!==t){s.s=s.d===day(1)?(s.s||0)+1:1;s.n=0;s.d=t}s.n=(s.n||0)+1;try{localStorage.setItem("wc2s",JSON.stringify(s))}catch(e){}}
@@ -270,38 +369,43 @@ function vPaste(){
   else if(ptxt.trim())prev=`<p class="mute">I couldn’t find the word. Put it on the first line, or write “Word: …”.</p>`;
   return`<div class="card"><b>1 · Get the card from an AI</b><p class="mute">Type a word (or several, separated by commas), copy the prompt, paste it into any AI chat, then bring the reply back here.</p><input id="pw" placeholder="e.g. egoist, altruist" value="${esc(pword)}"><div class="row"><button class="pri" data-a="cp">📋 Copy AI prompt</button></div><div id="cpn" class="mute" style="margin-top:6px">${esc(cpnote)}</div></div><div class="card"><b>2 · Paste the reply</b><p class="mute">Headings are sorted into the right places. For many words, put a line with only <b>-----</b> between cards.</p><textarea id="pt" style="min-height:170px" placeholder="Paste here…">${esc(ptxt)}</textarea><div class="row"><button data-a="tpl">Insert example format</button><button data-a="clr">Clear</button></div></div>`+prev
 }
-const blank=()=>({word:"",pron:"",roman:"",root:"",tags:"",meaning:"",translations:"",context:"",confuse:"",sentences:"",family:[{w:"",pos:"",pron:"",meaning:"",ex:""}]});
+const blank=()=>({word:"",pron:"",roman:"",root:"",tags:"",syn:"",ant:"",meaning:"",translations:"",context:"",confuse:"",sentences:"",family:[{w:"",pos:"",pron:"",meaning:"",ex:""}]});
 function vNew(){
   if(!draft)draft=blank();const d=draft,f=(k,l,ta)=>`<label>${l}</label>${ta?`<textarea data-d="${k}">${esc(d[k])}</textarea>`:`<input data-d="${k}" value="${esc(d[k])}">`}`;
-  return`<div class="card"><b>${editing?"Edit word":"New word"}</b>${f("word","Word")}${f("pron","Pronunciation (IPA)")}${f("roman","Say it in Roman letters (e.g. ee-GO-ist)")}${f("root","Root / origin")}${f("meaning","Main meaning",1)}${f("tags","Tags (comma separated, e.g. personality, office)")}<div class="h3" style="margin-top:18px">Word family (each word with its own pronunciation, meaning, example)</div>`+
+  return`<div class="card"><b>${editing?"Edit word":"New word"}</b>${f("word","Word")}${f("pron","Pronunciation (IPA)")}${f("roman","Say it in Roman letters (e.g. ee-GO-ist)")}${f("root","Root / origin")}${f("meaning","Main meaning",1)}${f("tags","Tags (comma separated, e.g. personality, office)")}${f("syn","Synonyms (comma separated)")}${f("ant","Antonyms (comma separated)")}<div class="h3" style="margin-top:18px">Word family (each word with its own pronunciation, meaning, example)</div>`+
   d.family.map((x,i)=>`<div class="frow"><input data-fi="${i}" data-fk="w" placeholder="Word (e.g. Egotist)" value="${esc(x.w)}"><input data-fi="${i}" data-fk="pos" placeholder="Type (noun / adjective…)" value="${esc(x.pos)}"><input data-fi="${i}" data-fk="pron" placeholder="Pronunciation /IPA/" value="${esc(x.pron)}"><input data-fi="${i}" data-fk="roman" placeholder="Say it in Roman letters (ee-GO-ist)" value="${esc(x.roman)}"><input data-fi="${i}" data-fk="meaning" placeholder="Meaning" value="${esc(x.meaning)}"><input data-fi="${i}" data-fk="ex" placeholder="Example sentence" value="${esc(x.ex)}"><button class="sm" data-rf="${i}">Remove</button></div>`).join("")+
   `<div class="row"><button data-a="addf">+ Add family word</button></div>`+SECS.map(([k,l])=>f(k,l,1)).join("")+`<div class="row"><button class="pri" data-a="save">Save card</button>${editing?`<button data-a="cancel">Cancel</button>`:""}</div></div>`
 }
 /* ---------- quiz ---------- */
 function pool(){const p=[];scoped().forEach(w=>{const fam=(w.family||[]).filter(f=>f.w&&f.meaning);fam.forEach(f=>p.push({w:f.w,m:f.meaning,e:f.ex||"",h:w.id}));
-  const fl=(w.meaning||w.meanings||"").split("\n")[0];if(fl&&!fam.some(f=>f.w.toLowerCase()===w.word.toLowerCase()))p.push({w:w.word,m:fl,e:(w.sentences||"").split("\n")[0]||"",h:w.id})});return p}
+  const fl=(w.meaning||w.meanings||"").split("\n")[0];if(fl&&!fam.some(f=>f.w.toLowerCase()===w.word.toLowerCase()))p.push({w:w.word,m:fl,e:(w.sentences||"").split("\n")[0]||"",h:w.id})});const hs=new Map(live().map(w=>[w.id,w]));p.forEach(it=>{const w=hs.get(it.h);if(w&&it.w.toLowerCase()===w.word.toLowerCase()){it.s=csv(w.syn);it.a=csv(w.ant)}});return p}
 function startQuiz(){
   const p=pool(),need=qmode==="type"?1:4;if(p.length<need){note=qmode==="type"?"No words with meanings in this set yet.":"Need at least 4 words with meanings (family words count) in this set.";render();return}
+  const dist=it=>shuffle(p.filter(o=>o!==it&&o.w.toLowerCase()!==it.w.toLowerCase())).slice(0,3);
   Q={i:0,score:0,wrong:[],sel:null,ok:false,typed:"",qs:shuffle(p).slice(0,qn).map(it=>{
     if(qmode==="type")return{it,k:"type",opts:[]};
     const k=["def","word"];if(it.e&&it.e.toLowerCase().includes(it.w.toLowerCase()))k.push("blank");
-    return{it,k:k[Math.floor(Math.random()*k.length)],opts:shuffle([it,...shuffle(p.filter(o=>o!==it&&o.w.toLowerCase()!==it.w.toLowerCase())).slice(0,3)])}})};render()}
+    if(it.s&&it.s.length)k.push("syn");if(it.a&&it.a.length)k.push("ant");
+    const kk=k[Math.floor(Math.random()*k.length)];
+    if(kk==="syn"||kk==="ant"){const list=kk==="syn"?it.s:it.a,lc=list.map(x=>x.toLowerCase()),ans={w:list[Math.floor(Math.random()*list.length)]},ds=shuffle(p.filter(o=>o.w.toLowerCase()!==it.w.toLowerCase()&&!lc.includes(o.w.toLowerCase()))).slice(0,3).map(o=>({w:o.w}));
+      if(ds.length>=3)return{it,k:kk,ans,opts:shuffle([ans,...ds])}}
+    return{it,k:kk==="syn"||kk==="ant"?"def":kk,opts:shuffle([it,...dist(it)])}})};render()}
 function vQuiz(){
   if(!Q){const n=pool().length,tags=[...new Set(live().flatMap(tagsOf))].sort(),hn=live().filter(w=>(w.miss||0)>=2).length;
     return`<div class="card"><div class="word">Quick quiz 🎯</div><p class="mute">Made from your own words, meanings and examples. ${n} items in this set.</p><label>Mode</label><div>${[["choice","Choose answer"],["type","Type the word"]].map(([k,l])=>`<span class="pill ${qmode===k?"on":""}" data-qm="${k}">${l}</span>`).join("")}</div><label>Words</label><div>${[["all","All"],["hard","🔥 Hard ("+hn+")"],...tags.map(t=>["tag:"+t,"#"+t])].map(([k,l])=>`<span class="pill ${qscope===k?"on":""}" data-qs="${esc(k)}">${esc(l)}</span>`).join("")}</div><label>Length</label><div>${[5,10,20].map(x=>`<span class="pill ${x===qn?"on":""}" data-n="${x}">${x} questions</span>`).join("")}</div><div class="row"><button class="pri" data-a="qstart">Start quiz</button></div><p class="mute">${esc(note)}</p></div>`}
   if(Q.i>=Q.qs.length){const wr=Q.wrong.map(x=>`<div class="fam"><b>${esc(x.w)}</b> – ${esc(x.m)}</div>`).join("");
     return`<div class="card" style="text-align:center"><div class="big">${Q.score}/${Q.qs.length}</div><p>${Q.score===Q.qs.length?"Perfect! 🎉":"Good effort. Review the ones you missed."}</p></div>${wr?`<div class="card"><div class="h3">Missed</div>${wr}<div class="row"><button data-a="qmiss">Add missed words to Today</button></div></div>`:""}<div class="row"><button class="pri" data-a="qagain">New quiz</button><button data-a="qquit">Done</button></div>`}
   const c=Q.qs[Q.i],it=c.it;let ask;
-  if(c.k==="type")ask=`Type the word that means:<br><i>${esc(it.m)}</i><br><span class="mute">Hint: ${esc(it.w[0])}${" _".repeat(Math.max(0,it.w.length-1))} (${it.w.length} letters)</span>`;else if(c.k==="def")ask=`What does <b>${esc(it.w)}</b> mean?`;else if(c.k==="word")ask=`Which word means: <i>${esc(it.m)}</i>`;
+  if(c.k==="syn")ask=`Which word is closest in meaning to <b>${esc(it.w)}</b>?`;else if(c.k==="ant")ask=`Which word is the opposite of <b>${esc(it.w)}</b>?`;else if(c.k==="type")ask=`Type the word that means:<br><i>${esc(it.m)}</i><br><span class="mute">Hint: ${esc(it.w[0])}${" _".repeat(Math.max(0,it.w.length-1))} (${it.w.length} letters)</span>`;else if(c.k==="def")ask=`What does <b>${esc(it.w)}</b> mean?`;else if(c.k==="word")ask=`Which word means: <i>${esc(it.m)}</i>`;
   else ask=`Fill in the blank:<br><i>“${esc(it.e.replace(new RegExp(it.w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i"),"_____"))}”</i>`;
-  const opts=c.k==="type"?(Q.sel===null?`<input id="ta" placeholder="Type the word" autocapitalize="off" autocomplete="off" style="margin-top:8px"><div class="row"><button class="pri" data-a="qcheck">Check</button><button data-a="qskip">Show answer</button></div>`:`<div class="opt ${Q.ok?"ok":"bad"}" style="cursor:default">Your answer: ${esc(Q.typed)}</div>`):c.opts.map((o,i)=>{let cl="";if(Q.sel!==null){if(o===it)cl="ok";else if(i===Q.sel)cl="bad"}return`<button class="opt ${cl}" data-o="${i}" ${Q.sel!==null?"disabled":""}>${esc(c.k==="def"?o.m:o.w)}</button>`}).join("");
+  const opts=c.k==="type"?(Q.sel===null?`<input id="ta" placeholder="Type the word" autocapitalize="off" autocomplete="off" style="margin-top:8px"><div class="row"><button class="pri" data-a="qcheck">Check</button><button data-a="qskip">Show answer</button></div>`:`<div class="opt ${Q.ok?"ok":"bad"}" style="cursor:default">Your answer: ${esc(Q.typed)}</div>`):c.opts.map((o,i)=>{let cl="";if(Q.sel!==null){if(o===(c.ans||it))cl="ok";else if(i===Q.sel)cl="bad"}return`<button class="opt ${cl}" data-o="${i}" ${Q.sel!==null?"disabled":""}>${esc(c.k==="def"?o.m:o.w)}</button>`}).join("");
   const fb=Q.sel!==null?`<div class="fam" style="margin-top:12px"><b>${esc(it.w)}</b><button class="spk" data-say="${esc(it.w)}" title="Listen">🔊</button> – ${esc(it.m)}${it.e?`<div class="ex">“${esc(it.e)}”</div>`:""}</div><div class="row"><button class="pri" data-a="qnext">${Q.i+1>=Q.qs.length?"See score":"Next"}</button></div>`:"";
   return`<div class="mute">Question ${Q.i+1} of ${Q.qs.length} · score ${Q.score}</div><div class="card"><div class="q">${ask}</div>${opts}${fb}</div><div class="row"><button class="sm" data-a="qquit">Quit quiz</button></div>`
 }
 /* ---------- render + events ---------- */
 function render(){
   $("tabs").innerHTML=TABS.map(([k,i,l])=>`<button data-t="${k}" class="${k===tab?"on":""}"><span>${i}</span>${l}</button>`).join("");
-  const V={today:vToday,words:vWords,quiz:vQuiz,paste:vPaste,new:vNew,set:vSet};
+  const V={today:vToday,words:vWords,dict:vDict,quiz:vQuiz,paste:vPaste,new:vNew,set:vSet};
   [...TABS.map(t=>t[0]),"set"].forEach(k=>$("v-"+k).classList.toggle("hide",k!==tab));$("v-"+tab).innerHTML=V[tab]()
 }
 const go=t=>{tab=t;flip=false;prac=null;if(t!=="new"){editing=null;draft=null}note="";render();scrollTo(0,0)};
@@ -314,8 +418,11 @@ async function addWord(p,ask){
   if(dup&&ask&&!confirm("“"+p.word+"” already exists. Replace it?"))return false;
   await put(Object.assign({box:0,due:0},dup||{},p,{id:dup?dup.id:nid()}));return true}
 document.addEventListener("click",async e=>{
-  const t=e.target.closest("[data-t],[data-a],[data-edit],[data-del],[data-o],[data-n],[data-rf],[data-say],[data-x],[data-sub],[data-s],[data-tag],[data-qm],[data-qs],[data-cfg]");if(!t)return;const D=t.dataset;
+  const t=e.target.closest("[data-t],[data-a],[data-edit],[data-del],[data-o],[data-n],[data-rf],[data-say],[data-x],[data-sub],[data-s],[data-tag],[data-qm],[data-qs],[data-cfg],[data-aud],[data-lk],[data-fs]");if(!t)return;const D=t.dataset;
+  if(D.aud){playAud(D.aud,D.say);return}
   if(D.say){say(D.say);return}
+  if(D.lk){lookup(D.lk);return}
+  if(D.fs){selFam.has(D.fs)?selFam.delete(D.fs):selFam.add(D.fs);return render()}
   if(D.x){OPEN.has(D.x)?OPEN.delete(D.x):OPEN.add(D.x);return render()}
   if(D.sub){const [i,k]=D.sub.split("|");SUB[i]=k;return render()}
   if(D.s){sort=D.s;return render()}
@@ -325,7 +432,7 @@ document.addEventListener("click",async e=>{
   if(D.cfg){const i=D.cfg.indexOf("|");cfg[D.cfg.slice(0,i)]=D.cfg.slice(i+1);saveCfg();applyCfg();return render()}
   if(D.t)return go(D.t);
   if(D.n){qn=+D.n;return render()}
-  if(D.o!==undefined){if(Q.sel!==null)return;const c=Q.qs[Q.i];Q.sel=+D.o;if(c.opts[Q.sel]===c.it){Q.score++;okIt(c.it)}else{Q.wrong.push(c.it);missIt(c.it)}return render()}
+  if(D.o!==undefined){if(Q.sel!==null)return;const c=Q.qs[Q.i];Q.sel=+D.o;if(c.opts[Q.sel]===(c.ans||c.it)){Q.score++;okIt(c.it)}else{Q.wrong.push(c.it);missIt(c.it)}return render()}
   if(D.edit){editing=D.edit;const w=words.find(x=>x.id===editing);draft=JSON.parse(JSON.stringify(w));draft.family=draft.family&&draft.family.length?draft.family:[{w:"",pos:"",pron:"",meaning:"",ex:""}];if(!draft.meaning&&draft.meanings)draft.meaning=draft.meanings;tab="new";render();return scrollTo(0,0)}
   if(D.del){if(confirm("Delete this card?"))del(D.del);return}
   if(D.rf!==undefined){draft.family.splice(+D.rf,1);return render()}
@@ -335,6 +442,10 @@ document.addEventListener("click",async e=>{
   else if(a==="pdone"){prac=null;flip=false;render()}
   else if(a==="xall"){OPEN=new Set(live().map(w=>w.id));render()}
   else if(a==="call"){OPEN=new Set();render()}
+  else if(a==="dsearch"){lookup(($("dq")||{}).value||dq)}
+  else if(a==="dadd"){await addLK()}
+  else if(a==="dopen"){if(LK&&LK.added){OPEN.add(LK.added);go("words")}}
+  else if(a==="dai"){pword=LK?LK.word:"";go("paste")}
   else if(a==="gplus"||a==="gminus"){cfg.goal=Math.max(0,Math.min(20,(+cfg.goal||0)+(a==="gplus"?1:-1)));saveCfg();render()}
   else if(a==="snooze"){try{localStorage.setItem("wc2b",String(Date.now()-5*DAY))}catch(e){}render()}
   else if(a==="cpbk"){note=(await copyText(JSON.stringify(live())))?"Backup copied. Paste it on your other device under Restore.":"Could not copy automatically. Use Export file instead.";render()}
@@ -363,10 +474,11 @@ document.addEventListener("click",async e=>{
 document.addEventListener("input",e=>{const t=e.target;
   if(t.id==="q"){q=t.value;$("v-words").innerHTML=vWords();fillIdx()}
   else if(t.id==="pw")pword=t.value;
+  else if(t.id==="dq")dq=t.value;
   else if(t.id==="pt"){ptxt=t.value;const pos=t.selectionStart;$("v-paste").innerHTML=vPaste();const n=$("pt");n.focus();n.setSelectionRange(pos,pos)}
   else if(t.dataset.d)draft[t.dataset.d]=t.value;
   else if(t.dataset.fi!==undefined)draft.family[+t.dataset.fi][t.dataset.fk]=t.value});
-document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="ta"){e.preventDefault();const b=document.querySelector('[data-a="qcheck"]');if(b)b.click()}});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="ta"){e.preventDefault();const b=document.querySelector('[data-a="qcheck"]');if(b)b.click()}if(e.key==="Enter"&&e.target.id==="dq"){e.preventDefault();lookup(e.target.value)}});
 $("imp").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;
   try{const list=JSON.parse(await f.text());if(!Array.isArray(list))throw 0;list.forEach(w=>{w.u=Date.now()});mergeIn(list);note="Imported "+list.length+" words.";render()}catch(x){note="That file could not be read.";render()}e.target.value=""});
 init();
