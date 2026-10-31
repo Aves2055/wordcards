@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f5d50">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>My Word Cards</title>
+<style>
+:root{color-scheme:light dark;--accb:color-mix(in srgb,var(--acc) 13%,var(--card));--bg:#f4f2ec;--card:#fff;--ink:#1d1d1b;--mute:#6b6a64;--line:#e3dfd5;--acc:#2f5d50;--on:#fff;--ok:#1f7a4d;--okb:#dff3e8;--bad:#b3402a;--badb:#fbe5df;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141413;--card:#201e1b;--ink:#efece4;--mute:#a39f93;--line:#35322c;--acc:#8fc4b2;--on:#10201a;--ok:#7fd1a3;--okb:#1d3a2b;--bad:#f0a08c;--badb:#3d2420}}
+:root[data-theme="dark"]{--bg:#141413;--card:#201e1b;--ink:#efece4;--mute:#a39f93;--line:#35322c;--acc:#8fc4b2;--on:#10201a;--ok:#7fd1a3;--okb:#1d3a2b;--bad:#f0a08c;--badb:#3d2420}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI","Noto Sans","Noto Sans Devanagari","Noto Sans Telugu","Noto Naskh Arabic",sans-serif}
+.wrap{max-width:780px;margin:0 auto;padding:14px 14px 96px}
+header{display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 14px}
+h1{font-size:22px;margin:0;letter-spacing:-.01em}
+#status{font-size:12px;color:var(--mute)}
+button,input,textarea{font:inherit;color:inherit}
+button{border:1px solid var(--line);background:var(--card);padding:10px 14px;border-radius:12px;cursor:pointer}
+button:active{transform:scale(.98)}
+button.pri{background:var(--acc);color:var(--on);border-color:var(--acc);font-weight:600}
+button.sm{padding:6px 10px;font-size:13px;border-radius:10px}
+input,textarea{width:100%;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px}
+textarea{min-height:80px;resize:vertical}
+input:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
+label{display:block;font-size:12px;color:var(--mute);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.05em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;padding-bottom:10px;margin-bottom:12px;border-bottom:2px solid var(--accb)}
+.word{font-size:28px;font-weight:750;line-height:1.1;color:var(--acc)}
+.sub{color:var(--mute);font-size:14px;margin-top:4px}
+.main{font-size:16px;margin-bottom:12px}
+.h3{margin:14px 0 6px;font-size:12px;color:var(--acc);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.fam{border-left:4px solid var(--acc);background:var(--accb);border-radius:4px 12px 12px 4px;padding:8px 12px;margin-bottom:8px}
+.fh{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+.fh b{font-size:17px}
+.tag{font-size:11px;background:var(--acc);color:var(--on);border-radius:20px;padding:1px 8px}
+.pr{color:var(--mute);font-size:13px}
+.ex{color:var(--mute);font-style:italic;font-size:14px;margin-top:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:560px){.grid{grid-template-columns:1fr}}
+.sec{background:var(--accb);border-radius:12px;padding:10px 12px}
+.sec .h3{margin:0 0 4px}.sec div{white-space:pre-wrap;font-size:15px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.row>*{flex:1}
+.mute{color:var(--mute);font-size:14px}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:12px}.bar button{white-space:nowrap}
+.hide{display:none}
+.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
+.tabs button{flex:1;border:0;background:none;padding:6px 2px;font-size:11px;color:var(--mute);border-radius:10px}
+.tabs button span{display:block;font-size:20px;line-height:1.2}
+.tabs button.on{color:var(--acc);background:var(--accb);font-weight:700}
+.opt{display:block;width:100%;text-align:left;margin-top:8px;padding:12px}
+.opt.ok{background:var(--okb);border-color:var(--ok)}.opt.bad{background:var(--badb);border-color:var(--bad)}
+.q{font-size:19px;margin:6px 0 8px}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:5px 14px;margin-right:6px;cursor:pointer}
+.pill.on{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.frow{border:1px dashed var(--line);border-radius:12px;padding:8px;margin-top:8px}
+.frow input{margin-bottom:6px}
+.big{font-size:42px;font-weight:800;color:var(--acc)}
+.spk{border:0;background:none;padding:2px 6px;font-size:16px;cursor:pointer;vertical-align:middle}
+.rm{color:var(--acc);font-size:13px;font-weight:600}
+:root[data-theme="light"]{color-scheme:light}:root[data-theme="dark"]{color-scheme:dark}
+.pill{margin-bottom:6px}
+.sw{display:inline-block;width:34px;height:34px;border-radius:50%;margin:0 8px 6px 0;border:3px solid transparent;cursor:pointer}.sw.on{border-color:var(--ink)}
+.tagc{display:inline-block;font-size:12px;color:var(--acc);background:var(--accb);border-radius:20px;padding:1px 8px;margin:0 6px 4px 0}.tgs{margin-bottom:6px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.stats div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 2px;text-align:center;font-size:11px;color:var(--mute)}
+.stats b{display:block;font-size:20px;color:var(--acc);line-height:1.2}
+.bar2{height:8px;background:var(--accb);border-radius:8px;overflow:hidden;margin:-2px 0 14px}.bar2 i{display:block;height:100%;background:var(--acc)}
+.item{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:8px}.item.open{border-color:var(--acc)}
+.irow{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;padding:12px 14px;cursor:pointer}
+.iw{flex:1;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px}.iw b{font-size:18px}
+.chev{color:var(--mute);transition:transform .15s}.item.open .chev{transform:rotate(180deg)}
+.im{width:100%;color:var(--mute);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ibody{padding:0 14px 14px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:12px 0 10px;scrollbar-width:none}
+.chip{white-space:nowrap;border:1px solid var(--line);border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;background:var(--card)}
+.chip.on{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.tr{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}.tr:last-child{border:0}
+.lang{min-width:90px;color:var(--acc);font-weight:600;font-size:13px}
+.txt{white-space:pre-wrap}
+.exs{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.exs:last-child{border:0}
+</style></head>
+<body><div class="wrap">
+<header><h1>📚 My Word Cards</h1><span><span id="status"></span> <button class="spk" data-t="set" title="Settings">⚙️</button></span></header>
+<div id="v-today"></div><div id="v-words" class="hide"></div><div id="v-quiz" class="hide"></div><div id="v-paste" class="hide"></div><div id="v-new" class="hide"></div><div id="v-set" class="hide"></div>
+</div>
+<div class="tabs" id="tabs"></div>
+<input type="file" id="imp" accept="application/json,.json" class="hide">
+<script>
+const TABS=[["today","☀️","Today"],["words","📖","Words"],["quiz","🎯","Quiz"],["paste","📋","Paste"],["new","➕","New"]];
+const TPL=`Egoist
+Pronunciation: /ˈiː.ɡoʊ.ɪst/
+Say it: EE-go-ist
+Root: Latin ego = I
+Tags: personality, behaviour
+Meaning: A person who puts their own interests above everyone else's.
+Grammar family:
+Egoist (noun) /ˈiː.ɡoʊ.ɪst/ [EE-go-ist] – a person who acts only in their own interest. Example: An egoist rarely thinks of how his choices hurt others.
+Egoism (noun) /ˈiː.ɡoʊ.ɪ.zəm/ [EE-go-iz-um] – the habit or belief of putting oneself first. Example: His egoism ruined the team.
+Egoistic (adjective) /ˌiː.ɡoʊˈɪs.tɪk/ [ee-go-IS-tik] – driven only by self-interest. Example: Her egoistic attitude lost her many friends.
+Egotist (noun) /ˈiː.ɡə.tɪst/ [EE-go-tist] – a boastful person who talks about themselves constantly. Example: The egotist dominated every conversation.
+Egomaniac (noun) /ˌiː.ɡoʊˈmeɪ.ni.æk/ [ee-go-MAY-nee-ak] – a person obsessed with themselves and their own importance. Example: The director was a known egomaniac.
+Egomaniacal (adjective) /ˌiː.ɡoʊ.məˈnaɪ.ə.kəl/ [ee-go-muh-NY-uh-kul] – extremely self-obsessed. Example: His egomaniacal speech bored everyone.
+Translations:
+Hindi: स्वार्थी व्यक्ति
+Urdu: خود غرض
+Roman Urdu: Khud gharaz
+Telugu: స్వార్థపరుడు
+Context & usage:
+Everyday: critical. Philosophy: neutral (ethical egoism).
+Don't confuse with:
+Egotist (with a t, for talk) boasts; an egoist simply puts self first.
+Sentences:
+An egoist rarely thinks of how his choices hurt others.`;
+const SECS=[["translations","Translations"],["context","Context & usage"],["confuse","Don’t confuse with"],["sentences","Example sentences"]];
+const DAY=864e5,STEPS=[0,1,2,4,8,16,32],LS="wc2";
+let words=[],store=null,tab="today",flip=false,q="",draft=null,editing=null,ptxt="",Q=null,qn=10,note="",pword="",cpnote="",OPEN=new Set(),SUB={},sort="az",prac=null,ftag="",qmode="choice",qscope="all";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const live=()=>words.filter(w=>!w.deleted);
+const nid=()=>"w"+Date.now()+Math.random().toString(36).slice(2,5);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function save(){try{localStorage.setItem(LS,JSON.stringify(words))}catch(e){}}
+function load(){try{words=JSON.parse(localStorage.getItem(LS)||"[]")}catch(e){words=[]}}
+function setStatus(){$("status").textContent=store?"Synced · works offline":"Saved on this device · works offline"}
+function fixNames(){let ch=false;words.forEach(w=>{if(!w.deleted&&/^[\[\(<\s]*word[\]\)>\s]*$/i.test(w.word||"")){const f=(w.family||[]).find(x=>x.w);if(f){w.word=f.w;w.u=Date.now();ch=true;if(store)store.doc(w.id).set(w).catch(()=>{})}}});if(ch)save()}
+function mergeIn(list){
+  const m=new Map(words.map(w=>[w.id,w])),rm=new Map(list.map(w=>[w.id,w]));
+  list.forEach(r=>{const l=m.get(r.id);if(!l||(r.u||0)>(l.u||0))m.set(r.id,r)});
+  words=[...m.values()];fixNames();save();
+  if(store)words.forEach(l=>{const r=rm.get(l.id);if(!r||(l.u||0)>(r.u||0))store.doc(l.id).set(l).catch(()=>{})});
+}
+async function put(w){
+  w.u=Date.now();const i=words.findIndex(x=>x.id===w.id);if(i>=0)words[i]=w;else words.push(w);
+  save();if(store)store.doc(w.id).set(w).catch(()=>{});render();
+}
+const del=id=>put({id,deleted:true});
+async function init(){
+  loadCfg();applyCfg();try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",applyCfg)}catch(e){}
+  load();fixNames();setStatus();render();
+  if(typeof claude==="undefined")return;
+  try{
+    const user=await claude.use("user"),db=await claude.use("db");
+    if(user&&db){const uid=await user.id();store=db.collection("data/users/"+uid);setStatus();
+      store.onSnapshot(s=>{mergeIn(s.docs.map(d=>d.data()).filter(Boolean));render()},()=>{store=null;setStatus()});}
+  }catch(e){}
+}
+/* ---------- paste parser ---------- */
+const HEAD=/^(tags?|word|heading|title|roman pronunciation|say it|sounds like|pronunciation|root|origin|etymology|grammar family|grammar|word family|family|translations?|meanings?|definitions?|context\s*(?:&|and)?\s*usage|context|usage|don['’]?t confuse(?: with)?|nuance|contextual sentences|example sentences|sentences|examples?)\b\s*[:\-–—]?\s*(.*)$/i;
+function keyOf(h){h=h.toLowerCase();
+  if(/^tag/.test(h))return"tags";if(/^(word|heading|title)/.test(h))return"word";if(/^(roman pron|say it|sounds)/.test(h))return"roman";if(/^pron/.test(h))return"pron";if(/^(root|origin|etym)/.test(h))return"root";
+  if(/^(grammar|word family|family)/.test(h))return"family";if(/^transl/.test(h))return"translations";if(/^(mean|defin)/.test(h))return"meaning";
+  if(/^(context|usage)/.test(h))return"context";if(/^(don|nuance)/.test(h))return"confuse";return"sentences"}
+function famLine(s){
+  s=s.replace(/^[\s•\-\*·]+/,"").replace(/^\d+[\.\)]\s+/,"").trim();if(!s)return null;
+  let ex="",pron="",roman="",pos="",mean="",w="",m=s.match(/\b(?:example|e\.g\.|eg)\s*[:\-–]\s*(.+)$/i);
+  if(m){ex=m[1].replace(/^["“]|["”]$/g,"").trim();s=s.slice(0,m.index).trim()}
+  m=s.match(/\/[^\/]{2,}\//);if(m){pron=m[0];s=s.replace(m[0]," ")}m=s.match(/\[([^\]]{2,})\]/);if(m){roman=m[1].replace(/^\s*(say|says|sounds like|roman)\s*[:\-–]?\s*/i,"").trim();s=s.replace(m[0]," ")}
+  m=s.match(/^(noun|verb|adjective|adverb|adj|adv|preposition)\b[^:]*:\s*(.+)$/i);if(m){pos=m[1].toLowerCase();s=m[2]}
+  m=s.match(/^([^:–—(]+?)\s*(?:\(([^)]*)\))?\s*(?:[:–—]|\s-\s)\s*(.+)$/);
+  if(m){w=m[1];if(m[2]&&!pos)pos=m[2];mean=m[3]}
+  else{m=s.match(/^([^(]+?)\s*(?:\(([^)]*)\))?\s*$/);if(m){w=m[1];if(m[2]){if(pos)mean=m[2];else pos=m[2]}}}
+  mean=mean.replace(/^meaning\s*[:\-–]\s*/i,"").replace(/\s+$/,"");
+  return{w:w.trim(),pos:pos.trim(),pron,roman,meaning:mean.trim(),ex}
+}
+function parse(t){
+  const buf={},push=(k,v)=>(buf[k]=buf[k]||[]).push(v);let cur=null,word="";
+  t.replace(/[│┌┐└┘─═╔╗╚╝║┬┴├┤┼]/g," ").split(/\r?\n/).forEach(raw=>{
+    const s=raw.replace(/^\s*\[\s*([^\]:]+?)\s*\]\s*:/,"$1:").trim();if(!s)return;
+    const m=HEAD.exec(s.replace(/^\d+[\.\)]\s+/,""));
+    if(m){cur=keyOf(m[1]);if(m[2].trim())push(cur,m[2].trim())}else if(cur)push(cur,s);else if(!word)word=s;
+  });
+  const j=(k,sep)=>(buf[k]||[]).join(sep||"\n");
+  let w=word||(buf.word||[])[0]||"";if(w===w.toUpperCase())w=w.charAt(0)+w.slice(1).toLowerCase();
+  const fam=(buf.family||[]).map(famLine).filter(f=>f&&f.w);w=w.replace(/^[\[\(<\s]+|[\]\)>\s]+$/g,"");if(!w||/^word$/i.test(w))w=fam.length?fam[0].w:w;let pr=j("pron"," "),rm=j("roman"," ");if(!rm){const mm=pr.match(/\(([^)]+)\)\s*$/);if(mm){rm=mm[1];pr=pr.replace(mm[0],"").trim()}}
+  return{word:w.trim(),pron:pr,roman:rm,tags:j("tags",", "),root:j("root"," "),meaning:j("meaning"),translations:j("translations"),context:j("context"),confuse:j("confuse"),sentences:j("sentences"),family:fam}
+}
+/* ---------- card ---------- */
+function famRow(f){return`<div class="fam"><div class="fh"><b>${esc(f.w)}</b><button class="spk" data-say="${esc(f.w)}" title="Listen">🔊</button>${f.pos?`<span class="tag">${esc(f.pos)}</span>`:""}${f.roman?`<span class="rm">${esc(f.roman)}</span>`:""}${f.pron?`<span class="pr">${esc(f.pron)}</span>`:""}</div>${f.meaning?`<div>${esc(f.meaning)}</div>`:""}${f.ex?`<div class="ex">“${esc(f.ex)}”</div>`:""}</div>`}
+function detail(w,id){
+  const fam=(w.family||[]).filter(f=>f.w),T=[];
+  if(fam.length||w.grammar)T.push(["family","Family"+(fam.length?" ("+fam.length+")":"")]);
+  if(w.translations)T.push(["tr","Translations"]);
+  if(w.context)T.push(["ctx","Context & usage"]);
+  if(w.confuse)T.push(["cf","Don’t confuse with"]);
+  if(w.sentences)T.push(["ex","Example sentences"]);
+  const cur=T.some(t=>t[0]===SUB[id])?SUB[id]:(T[0]||[])[0];let p="";
+  if(cur==="family")p=fam.length?fam.map(famRow).join(""):`<div class="txt">${esc(w.grammar)}</div>`;
+  else if(cur==="tr")p=w.translations.split("\n").filter(l=>l.trim()).map(l=>{const m=l.match(/^\s*([^:]{1,24}):\s*(.+)$/);return m?`<div class="tr"><span class="lang">${esc(m[1])}</span><span>${esc(m[2])}</span></div>`:`<div class="tr"><span>${esc(l)}</span></div>`}).join("");
+  else if(cur==="ctx")p=`<div class="txt">${esc(w.context)}</div>`;
+  else if(cur==="cf")p=`<div class="txt">${esc(w.confuse)}</div>`;
+  else if(cur==="ex")p=w.sentences.split("\n").map(l=>l.replace(/^[\s•\-\*\d\.\)]+/,"").trim()).filter(Boolean).map(l=>`<div class="exs"><span>“${esc(l)}”</span><button class="spk" data-say="${esc(l)}" title="Listen">🔊</button></div>`).join("");
+  const meta=[w.pron,w.root].filter(Boolean).map(esc).join(" · "),mean=w.meaning||w.meanings||"";
+  return(tagsOf(w).length?`<div class="tgs">${tagsOf(w).map(t=>`<span class="tagc">#${esc(t)}</span>`).join("")}</div>`:"")+(meta?`<div class="sub">${meta}</div>`:"")+(mean?`<div class="main" style="margin-top:8px">${esc(mean).replace(/\n/g,"<br>")}</div>`:"")+(T.length?`<div class="chips">${T.map(([k,l])=>`<span class="chip ${k===cur?"on":""}" data-sub="${esc(id)}|${k}">${esc(l)}</span>`).join("")}</div><div>${p}</div>`:"")
+}
+function full(w){return`<div class="card"><div class="head"><div><div class="word">${esc(w.word)} <button class="spk" data-say="${esc(w.word)}" title="Listen">🔊</button></div>${w.roman?`<div class="rm" style="margin-top:2px;font-size:15px">Say it: ${esc(w.roman)}</div>`:""}</div></div>${detail(w,w.id||"pv")}</div>`}
+function item(w){const o=OPEN.has(w.id),m=(w.meaning||w.meanings||"").split("\n")[0];
+  return`<div class="item ${o?"open":""}"><div class="irow" data-x="${w.id}"><div class="iw"><b>${esc(w.word)}</b>${(w.miss||0)>=2?"🔥":""}${w.roman?`<span class="rm">${esc(w.roman)}</span>`:""}</div><span class="chev">▾</span>${m?`<div class="im">${esc(m)}</div>`:""}</div>${o?`<div class="ibody">${detail(w,w.id)}<div class="row"><button class="sm" data-say="${esc(w.word)}">🔊 Listen</button><button class="sm" data-edit="${w.id}">✏️ Edit</button><button class="sm" data-del="${w.id}">🗑 Delete</button></div></div>`:""}</div>`}
+/* ---------- views ---------- */
+const CFG0={theme:"auto",accent:"green",fs:"1",goal:3,voice:"en-IN",rate:"0.85"};
+let cfg=Object.assign({},CFG0);
+const PAL={green:["#2f5d50","#8fc4b2"],blue:["#2f5f9e","#8db4e8"],purple:["#6a4aa3","#b9a2ea"],orange:["#b4571f","#f0a971"],rose:["#a8405a","#ec9bb0"]};
+const lget=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+function loadCfg(){try{cfg=Object.assign({},CFG0,JSON.parse(lget("wc2c")||"{}"))}catch(e){}}
+function saveCfg(){try{localStorage.setItem("wc2c",JSON.stringify(cfg))}catch(e){}}
+function applyCfg(){const R=document.documentElement;
+  if(cfg.theme==="auto")R.removeAttribute("data-theme");else R.setAttribute("data-theme",cfg.theme);
+  let dark=cfg.theme==="dark";if(cfg.theme==="auto"){try{dark=matchMedia("(prefers-color-scheme: dark)").matches}catch(e){}}
+  const p=PAL[cfg.accent]||PAL.green;R.style.setProperty("--acc",dark?p[1]:p[0]);R.style.zoom=cfg.fs}
+const tagsOf=w=>String(w.tags||"").split(/[,#]+/).map(x=>x.trim().toLowerCase()).filter(Boolean);
+function tagPills(){const tags=[...new Set(live().flatMap(tagsOf))].sort(),hn=live().filter(w=>(w.miss||0)>=2).length;
+  return[["","All"],["*hard","🔥 Hard ("+hn+")"],...tags.map(t=>[t,"#"+t])].map(([k,l])=>`<span class="chip ${ftag===k?"on":""}" data-tag="${esc(k)}">${esc(l)}</span>`).join("")}
+function scoped(){return live().filter(w=>qscope==="hard"?(w.miss||0)>=2:qscope.startsWith("tag:")?tagsOf(w).includes(qscope.slice(4)):true)}
+function missIt(it){const w=words.find(x=>x.id===it.h);if(w){w.miss=(w.miss||0)+1;put(w)}}
+function okIt(it){const w=words.find(x=>x.id===it.h);if(w&&(w.miss||0)>0){w.miss--;put(w)}}
+function goalLine(){const t=new Date().toDateString(),g=+cfg.goal||0;if(!g)return"";
+  const a=live().filter(w=>{const ts=parseInt(String(w.id).slice(1));return ts&&new Date(ts).toDateString()===t}).length;
+  return`<div class="mute" style="margin:-4px 0 12px">🌱 New words today: <b>${a}/${g}</b>${a>=g?" ✅":""} ${a<g?`<button class="sm" data-t="paste" style="margin-left:6px">Add a word</button>`:""}</div>`}
+function backupBanner(){const n=live().length,lb=+lget("wc2b")||0;if(n<5||Date.now()-lb<7*DAY)return"";
+  return`<div class="card" style="padding:10px 14px">💾 Your last backup was ${lb?Math.floor((Date.now()-lb)/DAY)+" days ago":"never"}.<div class="row"><button class="sm pri" data-a="exp">Export now</button><button class="sm" data-a="snooze">Later</button></div></div>`}
+const pills=(key,opts)=>opts.map(([v,l])=>`<span class="pill ${String(cfg[key])===String(v)?"on":""}" data-cfg="${key}|${v}">${l}</span>`).join("");
+function vSet(){
+  const sw=Object.keys(PAL).map(k=>`<span class="sw ${cfg.accent===k?"on":""}" data-cfg="accent|${k}" style="background:${PAL[k][0]}" title="${k}"></span>`).join(""),lb=+lget("wc2b")||0;
+  return`<div class="card"><b>Appearance</b><label>Theme</label><div>${pills("theme",[["auto","Auto"],["light","Light"],["dark","Dark"]])}</div><label>Accent colour</label><div>${sw}</div><label>Text size</label><div>${pills("fs",[["0.9","Small"],["1","Normal"],["1.15","Large"],["1.3","Extra large"]])}</div></div>
+<div class="card"><b>Learning</b><label>New words per day (goal)</label><div class="bar"><button class="sm" data-a="gminus">−</button><b style="min-width:30px;text-align:center">${cfg.goal}</b><button class="sm" data-a="gplus">+</button><span class="mute">0 turns the goal off</span></div><label>Pronunciation accent</label><div>${pills("voice",[["en-IN","India"],["en-US","US"],["en-GB","UK"]])}</div><label>Speaking speed</label><div>${pills("rate",[["0.7","Slow"],["0.85","Normal"],["1","Fast"]])}</div><div class="row"><button class="sm" data-say="egoist">🔊 Test voice</button></div></div>
+<div class="card"><b>Your data</b><p class="mute">${live().length} cards saved on this device. Last backup: ${lb?new Date(lb).toLocaleDateString():"never"}.</p><div class="row"><button class="sm" data-a="exp">⬇ Export file</button><button class="sm" data-a="imp">⬆ Import file</button><button class="sm" data-a="cpbk">📋 Copy backup text</button></div><label>Restore: paste backup text here</label><textarea id="rb" placeholder="Paste backup text from your other device…"></textarea><div class="row"><button class="sm pri" data-a="rbk">Restore</button></div><div class="mute" style="margin-top:8px">${esc(note)}</div></div>`}
+const day=o=>new Date(Date.now()-o*864e5-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+function st(){try{return JSON.parse(localStorage.getItem("wc2s")||"{}")}catch(e){return{}}}
+function bump(){const s=st(),t=day(0);if(s.d!==t){s.s=s.d===day(1)?(s.s||0)+1:1;s.n=0;s.d=t}s.n=(s.n||0)+1;try{localStorage.setItem("wc2s",JSON.stringify(s))}catch(e){}}
+function stats(){const s=st(),t=day(0),y=day(1);return{n:s.d===t?(s.n||0):0,s:(s.d===t||s.d===y)?(s.s||0):0}}
+function vocab(){const set=new Set();live().forEach(w=>{set.add(w.word.toLowerCase());(w.family||[]).forEach(f=>f.w&&set.add(f.w.toLowerCase()))});return set.size}
+const box=(n,l)=>`<div><b>${n}</b>${l}</div>`;
+function due(){const n=Date.now();return live().filter(w=>(w.due||0)<=n).sort((a,b)=>(a.due||0)-(b.due||0))}
+function when(ms){const h=(ms-Date.now())/36e5;return h<1?"in under an hour":h<24?"in about "+Math.round(h)+" hours":"in about "+Math.round(h/24)+" days"}
+function front(w){return`<div class="card" style="text-align:center"><div class="word" style="font-size:34px">${esc(w.word)} <button class="spk" data-say="${esc(w.word)}" title="Listen">🔊</button></div>${w.roman?`<div class="rm" style="font-size:16px;margin-top:4px">${esc(w.roman)}</div>`:""}<div class="sub">${esc(w.pron)}</div><p class="mute" style="margin-top:14px">Recall the meaning and its family words, then flip the card.</p></div>`}
+function vToday(){
+  const L=live();
+  if(!L.length)return`<div class="card"><div class="word">Welcome 👋</div><p>No words yet. Paste a word in the <b>Paste</b> tab, fill the <b>New</b> form, or start with an example.</p><div class="row"><button class="pri" data-a="ex">Add example: Egoist</button><button data-a="topaste">Go to Paste</button></div></div>`;
+  const d=due(),k=stats();
+  const top=`<div class="stats">${box(d.length,"Due now")}${box(k.n,"Done today")}${box(k.s+"🔥","Streak")}${box(vocab(),"Vocabulary")}</div>`+(k.n+d.length?`<div class="bar2"><i style="width:${Math.round(100*k.n/(k.n+d.length))}%"></i></div>`:"")+goalLine()+backupBanner();
+  if(prac){const w=L.find(x=>x.id===prac);if(w)return top+`<div class="mute" style="margin-bottom:8px">Practice mode · no schedule changes</div>`+(flip?full(w):front(w))+`<div class="row">${flip?`<button class="pri" data-a="prac">🔀 Another word</button><button data-a="pdone">Done</button>`:`<button class="pri" data-a="flip">Show card</button><button data-a="pdone">Done</button>`}</div>`;prac=null}
+  if(!d.length){const nx=L.map(w=>w.due||0).filter(x=>x>Date.now()).sort((a,b)=>a-b)[0];
+    return top+`<div class="card" style="text-align:center"><div class="word">All caught up ✅</div><p class="mute">${nx?"Next review "+when(nx)+". ":""}Want more practice?</p><div class="row"><button class="pri" data-t="quiz">🎯 Take a quiz</button><button data-a="prac">🔀 Random word</button></div></div>`}
+  const w=d[0];
+  return top+(flip?full(w):front(w))+`<div class="row">${flip?`<button data-a="again">😕 Again</button><button class="pri" data-a="knew">😀 Knew it</button>`:`<button class="pri" data-a="flip">Show card</button>`}</div>`
+}
+function strip(){const a=live();return`<div class="stats">${box(a.length,"Cards")}${box(vocab(),"Vocabulary")}${box(a.filter(w=>(w.box||0)>=3).length,"Learned")}${box(due().length,"Due now")}</div>`}
+function vWords(){
+  const s=q.toLowerCase(),idn=w=>parseInt(String(w.id).slice(1))||0;
+  const list=live().filter(w=>(!s||JSON.stringify(w).toLowerCase().includes(s))&&(!ftag||(ftag==="*hard"?(w.miss||0)>=2:tagsOf(w).includes(ftag))));
+  list.sort(sort==="new"?(a,b)=>idn(b)-idn(a):sort==="due"?(a,b)=>(a.due||0)-(b.due||0):(a,b)=>a.word.localeCompare(b.word));
+  return strip()+`<input id="q" placeholder="Search ${live().length} words…" value="${esc(q)}"><div class="chips" style="padding:10px 0 2px">${tagPills()}</div><div class="bar" style="margin-top:6px;flex-wrap:wrap">${[["az","A–Z"],["new","Newest"],["due","Due soon"]].map(([k,l])=>`<span class="pill ${sort===k?"on":""}" data-s="${k}">${l}</span>`).join("")}<span style="flex:1"></span><button class="sm" data-a="xall">Expand all</button><button class="sm" data-a="call">Collapse</button></div><div class="bar"><button class="sm" data-a="exp">⬇ Export backup</button><button class="sm" data-a="imp">⬆ Import backup</button></div><div id="note" class="mute">${esc(note)}</div>`+(list.map(item).join("")||`<p class="mute">No words found.</p>`)
+}
+const blocks=t=>t.split(/^\s*-{3,}\s*$/m).map(x=>x.trim()).filter(Boolean);
+function aiPrompt(ws){const list=ws.split(/[,\n]+/).map(x=>x.trim()).filter(Boolean),many=list.length>1;
+return`Create a vocabulary card for ${many?"each of these English words: "+list.join(", ")+". Put a line with only ----- between the cards.":"the English word: "+(list[0]||"[YOUR WORD]")+"."}
+
+Reply in plain text only (no tables, no bold, no markdown, no extra talk). Copy the structure, headings and line style of the example card below exactly, but with the new word's own content. The first line must be the new word itself, with no brackets and no label. In "Grammar family", list EVERY related word (noun, verb, adjective, adverb and related forms), one per line, each with its type in brackets, /IPA/, [Roman-letter pronunciation], a dash, the meaning, and "Example:" with a sentence. Keep the Hindi, Urdu and Telugu translations accurate and natural.
+
+EXAMPLE CARD (for the word egoist):
+${TPL}`}
+async function copyText(t){try{await navigator.clipboard.writeText(t);return true}catch(e){const a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();let ok=false;try{ok=document.execCommand("copy")}catch(x){}a.remove();return ok}}
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=cfg.voice;u.rate=parseFloat(cfg.rate)||.85;speechSynthesis.speak(u)}catch(e){}}
+function vPaste(){
+  const ps=blocks(ptxt).map(parse).filter(p=>p.word);let prev="";
+  if(ps.length===1)prev=`<div class="mute" style="margin-bottom:8px">Preview: this is how it will be added</div>${full(ps[0])}<div class="row"><button data-a="editp">Edit first</button><button class="pri" data-a="addp">Add to word list</button></div>`;
+  else if(ps.length>1)prev=`<div class="card"><div class="h3">${ps.length} words found</div>${ps.map(p=>`<div class="fam"><b>${esc(p.word)}</b> <span class="mute">· ${p.family.length} family words</span></div>`).join("")}<div class="row"><button class="pri" data-a="addp">Add all ${ps.length} words</button></div></div>`;
+  else if(ptxt.trim())prev=`<p class="mute">I couldn’t find the word. Put it on the first line, or write “Word: …”.</p>`;
+  return`<div class="card"><b>1 · Get the card from an AI</b><p class="mute">Type a word (or several, separated by commas), copy the prompt, paste it into any AI chat, then bring the reply back here.</p><input id="pw" placeholder="e.g. egoist, altruist" value="${esc(pword)}"><div class="row"><button class="pri" data-a="cp">📋 Copy AI prompt</button></div><div id="cpn" class="mute" style="margin-top:6px">${esc(cpnote)}</div></div><div class="card"><b>2 · Paste the reply</b><p class="mute">Headings are sorted into the right places. For many words, put a line with only <b>-----</b> between cards.</p><textarea id="pt" style="min-height:170px" placeholder="Paste here…">${esc(ptxt)}</textarea><div class="row"><button data-a="tpl">Insert example format</button><button data-a="clr">Clear</button></div></div>`+prev
+}
+const blank=()=>({word:"",pron:"",roman:"",root:"",tags:"",meaning:"",translations:"",context:"",confuse:"",sentences:"",family:[{w:"",pos:"",pron:"",meaning:"",ex:""}]});
+function vNew(){
+  if(!draft)draft=blank();const d=draft,f=(k,l,ta)=>`<label>${l}</label>${ta?`<textarea data-d="${k}">${esc(d[k])}</textarea>`:`<input data-d="${k}" value="${esc(d[k])}">`}`;
+  return`<div class="card"><b>${editing?"Edit word":"New word"}</b>${f("word","Word")}${f("pron","Pronunciation (IPA)")}${f("roman","Say it in Roman letters (e.g. ee-GO-ist)")}${f("root","Root / origin")}${f("meaning","Main meaning",1)}${f("tags","Tags (comma separated, e.g. personality, office)")}<div class="h3" style="margin-top:18px">Word family (each word with its own pronunciation, meaning, example)</div>`+
+  d.family.map((x,i)=>`<div class="frow"><input data-fi="${i}" data-fk="w" placeholder="Word (e.g. Egotist)" value="${esc(x.w)}"><input data-fi="${i}" data-fk="pos" placeholder="Type (noun / adjective…)" value="${esc(x.pos)}"><input data-fi="${i}" data-fk="pron" placeholder="Pronunciation /IPA/" value="${esc(x.pron)}"><input data-fi="${i}" data-fk="roman" placeholder="Say it in Roman letters (ee-GO-ist)" value="${esc(x.roman)}"><input data-fi="${i}" data-fk="meaning" placeholder="Meaning" value="${esc(x.meaning)}"><input data-fi="${i}" data-fk="ex" placeholder="Example sentence" value="${esc(x.ex)}"><button class="sm" data-rf="${i}">Remove</button></div>`).join("")+
+  `<div class="row"><button data-a="addf">+ Add family word</button></div>`+SECS.map(([k,l])=>f(k,l,1)).join("")+`<div class="row"><button class="pri" data-a="save">Save card</button>${editing?`<button data-a="cancel">Cancel</button>`:""}</div></div>`
+}
+/* ---------- quiz ---------- */
+function pool(){const p=[];scoped().forEach(w=>{const fam=(w.family||[]).filter(f=>f.w&&f.meaning);fam.forEach(f=>p.push({w:f.w,m:f.meaning,e:f.ex||"",h:w.id}));
+  const fl=(w.meaning||w.meanings||"").split("\n")[0];if(fl&&!fam.some(f=>f.w.toLowerCase()===w.word.toLowerCase()))p.push({w:w.word,m:fl,e:(w.sentences||"").split("\n")[0]||"",h:w.id})});return p}
+function startQuiz(){
+  const p=pool(),need=qmode==="type"?1:4;if(p.length<need){note=qmode==="type"?"No words with meanings in this set yet.":"Need at least 4 words with meanings (family words count) in this set.";render();return}
+  Q={i:0,score:0,wrong:[],sel:null,ok:false,typed:"",qs:shuffle(p).slice(0,qn).map(it=>{
+    if(qmode==="type")return{it,k:"type",opts:[]};
+    const k=["def","word"];if(it.e&&it.e.toLowerCase().includes(it.w.toLowerCase()))k.push("blank");
+    return{it,k:k[Math.floor(Math.random()*k.length)],opts:shuffle([it,...shuffle(p.filter(o=>o!==it&&o.w.toLowerCase()!==it.w.toLowerCase())).slice(0,3)])}})};render()}
+function vQuiz(){
+  if(!Q){const n=pool().length,tags=[...new Set(live().flatMap(tagsOf))].sort(),hn=live().filter(w=>(w.miss||0)>=2).length;
+    return`<div class="card"><div class="word">Quick quiz 🎯</div><p class="mute">Made from your own words, meanings and examples. ${n} items in this set.</p><label>Mode</label><div>${[["choice","Choose answer"],["type","Type the word"]].map(([k,l])=>`<span class="pill ${qmode===k?"on":""}" data-qm="${k}">${l}</span>`).join("")}</div><label>Words</label><div>${[["all","All"],["hard","🔥 Hard ("+hn+")"],...tags.map(t=>["tag:"+t,"#"+t])].map(([k,l])=>`<span class="pill ${qscope===k?"on":""}" data-qs="${esc(k)}">${esc(l)}</span>`).join("")}</div><label>Length</label><div>${[5,10,20].map(x=>`<span class="pill ${x===qn?"on":""}" data-n="${x}">${x} questions</span>`).join("")}</div><div class="row"><button class="pri" data-a="qstart">Start quiz</button></div><p class="mute">${esc(note)}</p></div>`}
+  if(Q.i>=Q.qs.length){const wr=Q.wrong.map(x=>`<div class="fam"><b>${esc(x.w)}</b> – ${esc(x.m)}</div>`).join("");
+    return`<div class="card" style="text-align:center"><div class="big">${Q.score}/${Q.qs.length}</div><p>${Q.score===Q.qs.length?"Perfect! 🎉":"Good effort. Review the ones you missed."}</p></div>${wr?`<div class="card"><div class="h3">Missed</div>${wr}<div class="row"><button data-a="qmiss">Add missed words to Today</button></div></div>`:""}<div class="row"><button class="pri" data-a="qagain">New quiz</button><button data-a="qquit">Done</button></div>`}
+  const c=Q.qs[Q.i],it=c.it;let ask;
+  if(c.k==="type")ask=`Type the word that means:<br><i>${esc(it.m)}</i><br><span class="mute">Hint: ${esc(it.w[0])}${" _".repeat(Math.max(0,it.w.length-1))} (${it.w.length} letters)</span>`;else if(c.k==="def")ask=`What does <b>${esc(it.w)}</b> mean?`;else if(c.k==="word")ask=`Which word means: <i>${esc(it.m)}</i>`;
+  else ask=`Fill in the blank:<br><i>“${esc(it.e.replace(new RegExp(it.w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i"),"_____"))}”</i>`;
+  const opts=c.k==="type"?(Q.sel===null?`<input id="ta" placeholder="Type the word" autocapitalize="off" autocomplete="off" style="margin-top:8px"><div class="row"><button class="pri" data-a="qcheck">Check</button><button data-a="qskip">Show answer</button></div>`:`<div class="opt ${Q.ok?"ok":"bad"}" style="cursor:default">Your answer: ${esc(Q.typed)}</div>`):c.opts.map((o,i)=>{let cl="";if(Q.sel!==null){if(o===it)cl="ok";else if(i===Q.sel)cl="bad"}return`<button class="opt ${cl}" data-o="${i}" ${Q.sel!==null?"disabled":""}>${esc(c.k==="def"?o.m:o.w)}</button>`}).join("");
+  const fb=Q.sel!==null?`<div class="fam" style="margin-top:12px"><b>${esc(it.w)}</b><button class="spk" data-say="${esc(it.w)}" title="Listen">🔊</button> – ${esc(it.m)}${it.e?`<div class="ex">“${esc(it.e)}”</div>`:""}</div><div class="row"><button class="pri" data-a="qnext">${Q.i+1>=Q.qs.length?"See score":"Next"}</button></div>`:"";
+  return`<div class="mute">Question ${Q.i+1} of ${Q.qs.length} · score ${Q.score}</div><div class="card"><div class="q">${ask}</div>${opts}${fb}</div><div class="row"><button class="sm" data-a="qquit">Quit quiz</button></div>`
+}
+/* ---------- render + events ---------- */
+function render(){
+  $("tabs").innerHTML=TABS.map(([k,i,l])=>`<button data-t="${k}" class="${k===tab?"on":""}"><span>${i}</span>${l}</button>`).join("");
+  const V={today:vToday,words:vWords,quiz:vQuiz,paste:vPaste,new:vNew,set:vSet};
+  [...TABS.map(t=>t[0]),"set"].forEach(k=>$("v-"+k).classList.toggle("hide",k!==tab));$("v-"+tab).innerHTML=V[tab]()
+}
+const go=t=>{tab=t;flip=false;prac=null;if(t!=="new"){editing=null;draft=null}note="";render();scrollTo(0,0)};
+const fillIdx=()=>{const i=$("q");if(i){i.focus();i.setSelectionRange(q.length,q.length)}};
+async function dl(name,text){
+  try{if(typeof claude!=="undefined"){const d=await claude.use("downloads");if(d){await d.save({filename:name,data:text});return}}}catch(e){}
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:"application/json"}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
+async function addWord(p,ask){
+  const dup=live().find(w=>w.word.toLowerCase()===p.word.toLowerCase());
+  if(dup&&ask&&!confirm("“"+p.word+"” already exists. Replace it?"))return false;
+  await put(Object.assign({box:0,due:0},dup||{},p,{id:dup?dup.id:nid()}));return true}
+document.addEventListener("click",async e=>{
+  const t=e.target.closest("[data-t],[data-a],[data-edit],[data-del],[data-o],[data-n],[data-rf],[data-say],[data-x],[data-sub],[data-s],[data-tag],[data-qm],[data-qs],[data-cfg]");if(!t)return;const D=t.dataset;
+  if(D.say){say(D.say);return}
+  if(D.x){OPEN.has(D.x)?OPEN.delete(D.x):OPEN.add(D.x);return render()}
+  if(D.sub){const [i,k]=D.sub.split("|");SUB[i]=k;return render()}
+  if(D.s){sort=D.s;return render()}
+  if(D.tag!==undefined){ftag=D.tag;return render()}
+  if(D.qm){qmode=D.qm;return render()}
+  if(D.qs){qscope=D.qs;return render()}
+  if(D.cfg){const i=D.cfg.indexOf("|");cfg[D.cfg.slice(0,i)]=D.cfg.slice(i+1);saveCfg();applyCfg();return render()}
+  if(D.t)return go(D.t);
+  if(D.n){qn=+D.n;return render()}
+  if(D.o!==undefined){if(Q.sel!==null)return;const c=Q.qs[Q.i];Q.sel=+D.o;if(c.opts[Q.sel]===c.it){Q.score++;okIt(c.it)}else{Q.wrong.push(c.it);missIt(c.it)}return render()}
+  if(D.edit){editing=D.edit;const w=words.find(x=>x.id===editing);draft=JSON.parse(JSON.stringify(w));draft.family=draft.family&&draft.family.length?draft.family:[{w:"",pos:"",pron:"",meaning:"",ex:""}];if(!draft.meaning&&draft.meanings)draft.meaning=draft.meanings;tab="new";render();return scrollTo(0,0)}
+  if(D.del){if(confirm("Delete this card?"))del(D.del);return}
+  if(D.rf!==undefined){draft.family.splice(+D.rf,1);return render()}
+  const a=D.a;
+  if(a==="flip"){flip=true;render()}
+  else if(a==="prac"){const L=live();if(L.length){prac=L[Math.floor(Math.random()*L.length)].id;flip=false}render()}
+  else if(a==="pdone"){prac=null;flip=false;render()}
+  else if(a==="xall"){OPEN=new Set(live().map(w=>w.id));render()}
+  else if(a==="call"){OPEN=new Set();render()}
+  else if(a==="gplus"||a==="gminus"){cfg.goal=Math.max(0,Math.min(20,(+cfg.goal||0)+(a==="gplus"?1:-1)));saveCfg();render()}
+  else if(a==="snooze"){try{localStorage.setItem("wc2b",String(Date.now()-5*DAY))}catch(e){}render()}
+  else if(a==="cpbk"){note=(await copyText(JSON.stringify(live())))?"Backup copied. Paste it on your other device under Restore.":"Could not copy automatically. Use Export file instead.";render()}
+  else if(a==="rbk"){try{const l=JSON.parse(($("rb").value||"").trim());if(!Array.isArray(l))throw 0;l.forEach(w=>{w.u=Date.now()});mergeIn(l);note="Restored "+l.length+" words."}catch(x){note="That text is not a valid backup."}render()}
+  else if(a==="knew"||a==="again"){const w=due()[0];if(!w)return;const ok=a==="knew",b=ok?Math.min((w.box||0)+1,6):0;if(!ok)w.miss=(w.miss||0)+1;else if(w.miss)w.miss--;w.box=b;w.due=ok?Date.now()+STEPS[b]*DAY:Date.now()+6e5;flip=false;bump();put(w)}
+  else if(a==="ex"){await addWord(parse(TPL),false)}
+  else if(a==="topaste")go("paste");
+  else if(a==="cp"){const ok=await copyText(aiPrompt(pword));cpnote=ok?"Copied! Paste it into an AI chat, then paste the reply below.":"Could not copy automatically. Select the text manually from the AI prompt below.";const n=$("cpn");if(n)n.textContent=cpnote}
+  else if(a==="tpl"){ptxt=TPL;render()}
+  else if(a==="clr"){ptxt="";render()}
+  else if(a==="addp"){for(const p of blocks(ptxt).map(parse).filter(p=>p.word))await addWord(p,true);ptxt="";tab="words";render();scrollTo(0,0)}
+  else if(a==="editp"){draft=Object.assign(blank(),parse(blocks(ptxt)[0]||""));if(!draft.family.length)draft.family=blank().family;ptxt="";tab="new";render();scrollTo(0,0)}
+  else if(a==="addf"){draft.family.push({w:"",pos:"",pron:"",meaning:"",ex:""});render()}
+  else if(a==="cancel")go("words");
+  else if(a==="save"){if(!draft.word.trim()){alert("Please enter the word.");return}
+    const p=JSON.parse(JSON.stringify(draft));p.family=p.family.filter(f=>f.w.trim());delete p.grammar;delete p.meanings;
+    const old=editing?words.find(x=>x.id===editing):null;await put(Object.assign({box:0,due:0},old||{},p,{id:old?old.id:nid()}));editing=null;draft=null;tab="words";render();scrollTo(0,0)}
+  else if(a==="exp"){await dl("my-word-cards.json",JSON.stringify(live(),null,2));try{localStorage.setItem("wc2b",String(Date.now()))}catch(e){}render()}
+  else if(a==="imp")$("imp").click();
+  else if(a==="qstart"||a==="qagain")startQuiz();
+  else if(a==="qcheck"||a==="qskip"){const c=Q.qs[Q.i],v=a==="qcheck"?($("ta").value||"").trim():"";if(a==="qcheck"&&!v){$("ta").focus();return}Q.typed=a==="qskip"?"(showed answer)":v;Q.ok=a==="qcheck"&&v.toLowerCase()===c.it.w.toLowerCase();Q.sel=1;if(Q.ok){Q.score++;okIt(c.it)}else{Q.wrong.push(c.it);missIt(c.it)}render()}
+  else if(a==="qnext"){Q.i++;Q.sel=null;Q.typed="";render()}
+  else if(a==="qquit"){Q=null;render()}
+  else if(a==="qmiss"){const ids=new Set(Q.wrong.map(x=>x.h));for(const w of live())if(ids.has(w.id)){w.due=0;w.box=0;await put(w)}Q=null;go("today")}
+});
+document.addEventListener("input",e=>{const t=e.target;
+  if(t.id==="q"){q=t.value;$("v-words").innerHTML=vWords();fillIdx()}
+  else if(t.id==="pw")pword=t.value;
+  else if(t.id==="pt"){ptxt=t.value;const pos=t.selectionStart;$("v-paste").innerHTML=vPaste();const n=$("pt");n.focus();n.setSelectionRange(pos,pos)}
+  else if(t.dataset.d)draft[t.dataset.d]=t.value;
+  else if(t.dataset.fi!==undefined)draft.family[+t.dataset.fi][t.dataset.fk]=t.value});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="ta"){e.preventDefault();const b=document.querySelector('[data-a="qcheck"]');if(b)b.click()}});
+$("imp").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;
+  try{const list=JSON.parse(await f.text());if(!Array.isArray(list))throw 0;list.forEach(w=>{w.u=Date.now()});mergeIn(list);note="Imported "+list.length+" words.";render()}catch(x){note="That file could not be read.";render()}e.target.value=""});
+init();
+</script><script>if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script>
+</body></html>
