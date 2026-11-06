@@ -1,26 +1,23 @@
-MY WORD CARDS - install steps (about 10 minutes, one time)
+MY VOCABULARY HUB - INSTALLATION & RUN GUIDE
 
-Files: index.html, manifest.webmanifest, sw.js, icon-192.png, icon-512.png
-(Unzip first. Keep all five files together, same names.)
+Package Contents:
+- index.html (Main application layout)
+- app.js (JavaScript application logic, API lookups, local database, connection maps)
+- manifest.webmanifest (PWA configuration)
+- sw.js (Service Worker for offline support)
+- icon-192.png (App icon 192x192)
+- icon-512.png (App icon 512x512)
 
-GITHUB PAGES (free)
-1. Make a free account at github.com and sign in (use a laptop for this).
-2. Click + (top right) > New repository. Name it: wordcards. Choose Public. Create it.
-3. In the new repository click "uploading an existing file", drag in the five files, then Commit changes.
-4. Go to Settings > Pages. Under Branch choose main and folder /(root), then Save.
-5. After about a minute your app is at: https://YOUR-USERNAME.github.io/wordcards/
-6. Open that link once on your phone and once on your laptop.
-   Android Chrome: menu (three dots) > Install app / Add to Home screen.
-   iPhone Safari: Share > Add to Home Screen.
-   Laptop Chrome/Edge: install icon at the right end of the address bar.
+HOW TO RUN LOCALLY:
+1. Extract all files into a single folder.
+2. Open index.html directly in any web browser (Chrome, Edge, Safari, Firefox).
+   Or run a local HTTP server:
+   - Python: python -m http.server 8000
+   - Node: npx serve .
+3. Open http://localhost:8000 in your browser.
 
-AFTER THAT it opens from your home screen and works offline. Your words stay on each device.
-Move words between devices: Settings (gear) > Copy backup text, then Restore on the other device.
-
-UPDATING THE APP LATER: in your repository click Add file > Upload files, drop the new index.html
-(same name) and Commit. Open the app twice to get the new version.
-Note: the repository is public, but your words are never uploaded. They live only on your devices.
-
-DICTIONARY (new): the Dict tab looks words up online (definitions by word type, pronunciation, synonyms,
-antonyms, a root and relations map). It needs internet when you search. Saved cards always work offline.
-Updating from an older version: upload the new index.html and sw.js (same names), then open the app twice.
+HOSTING ON GITHUB PAGES (FREE):
+1. Create a repository on github.com (e.g. wordhub).
+2. Upload all files to the repository.
+3. Go to Settings > Pages, choose Branch: main and folder: /(root), then Save.
+4. Your website will be live at https://YOUR-USERNAME.github.io/wordhub/
