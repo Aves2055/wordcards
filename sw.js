@@ -1,7 +1,8 @@
-const CACHE_NAME = 'wordhub-v1';
+const CACHE_NAME = 'wordhub-v2';
 const ASSETS = [
   './',
   './index.html',
+  './style.css',
   './app.js',
   './manifest.webmanifest',
   './icon-192.png',

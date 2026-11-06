@@ -3,124 +3,110 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>My Vocabulary Hub</title>
-<style>
-:root {
-  --bg: #f8fafc; --card: #ffffff; --ink: #0f172a; --mute: #64748b;
-  --line: #e2e8f0; --acc: #2563eb; --accb: #eff6ff; --on: #ffffff;
-  --ok: #16a34a; --okb: #f0fdf4; --bad: #dc2626; --badb: #fef2f2;
-  --purple: #9333ea; --purpleb: #faf5ff;
-}
-[data-t="d"] {
-  --bg: #0f172a; --card: #1e293b; --ink: #f8fafc; --mute: #94a3b8;
-  --line: #334155; --acc: #3b82f6; --accb: #1e3a8a; --on: #ffffff;
-  --ok: #4ade80; --okb: #14532d; --bad: #f87171; --badb: #450a0a;
-  --purple: #c084fc; --purpleb: #3b0764;
-}
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, sans-serif; }
-header { background: var(--card); border-bottom: 1px solid var(--line); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-h1 { font-size: 18px; margin: 0; font-weight: 700; color: var(--acc); }
-nav button { border: none; background: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--mute); }
-nav button.on { background: var(--accb); color: var(--acc); font-weight: 600; }
-main { max-width: 860px; margin: 24px auto; padding: 0 16px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
-.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-input, select { flex: 1; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 10px; padding: 10px 14px; font-size: 15px; }
-input:focus, select:focus { outline: 2px solid var(--acc); outline-offset: -1px; }
-button.btn { border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 500; transition: all 0.15s ease; }
-button.btn:hover { background: var(--accb); }
-button.btn-pri { background: var(--acc); color: var(--on); border-color: var(--acc); font-weight: 600; }
-button.btn-pri:hover { opacity: 0.9; }
-.pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 16px; font-size: 13px; margin: 0 4px 4px 0; background: var(--accb); color: var(--acc); border: 1px solid var(--line); cursor: pointer; }
-.pill.ok { background: var(--okb); color: var(--ok); border-color: var(--ok); }
-.pill.bad { background: var(--badb); color: var(--bad); border-color: var(--bad); }
-.pill.purple { background: var(--purpleb); color: var(--purple); border-color: var(--purple); }
-.def-box { border-bottom: 1px solid var(--line); padding: 12px 0; }
-.def-box:last-child { border: none; }
-.pos-tag { font-size: 11px; text-transform: uppercase; font-weight: 700; background: var(--accb); color: var(--acc); padding: 2px 7px; border-radius: 4px; display: inline-block; margin-bottom: 4px; }
-.ex { font-style: italic; color: var(--mute); font-size: 14px; margin-top: 6px; }
-.inline-trl { background: var(--accb); color: var(--acc); padding: 6px 10px; border-radius: 6px; font-size: 13px; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
-.inline-trl small { opacity: 0.75; font-weight: 600; text-transform: uppercase; font-size: 10px; }
-.badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.03em; }
-.badge.concept { background: var(--okb); color: var(--ok); }
-.badge.person { background: var(--accb); color: var(--acc); }
-.badge.condition { background: var(--badb); color: var(--bad); }
-.badge.attribute { background: var(--purpleb); color: var(--purple); }
-.nuance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 14px; }
-.nuance-card { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--bg); transition: transform 0.1s; }
-.nuance-card:hover { transform: translateY(-2px); }
-.nuance-card b { cursor: pointer; color: var(--acc); }
-.mute { color: var(--mute); font-size: 13px; }
-svg { width: 100%; max-height: 340px; background: var(--card); border-radius: 12px; border: 1px solid var(--line); display: block; }
-.legend { display: flex; gap: 14px; justify-content: center; font-size: 12px; color: var(--mute); margin-top: 8px; flex-wrap: wrap; }
-.legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 4px; }
-</style>
+<title>WordHub — English Knowledge & Vocabulary Platform</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-  <h1>📚 WordHub</h1>
-  <nav>
-    <button id="nav-search" class="on" onclick="setTab('search')">🔍 Search</button>
-    <button id="nav-saved" onclick="setTab('saved')">📚 Saved (<span id="saved-count">0</span>)</button>
-    <button id="nav-settings" onclick="setTab('settings')">⚙️ Settings</button>
-  </nav>
+<header class="navbar">
+  <div class="nav-container">
+    <div class="brand">
+      <span class="brand-icon">📚</span>
+      <span class="brand-title">WordHub</span>
+    </div>
+    <nav class="nav-links">
+      <button id="nav-search" class="nav-btn active" onclick="setTab('search')">🔍 Search & Discover</button>
+
+      <button id="nav-saved" class="nav-btn" onclick="setTab('saved')">📚 Saved Words (<span id="saved-count">0</span>)</button>
+      <button id="nav-settings" class="nav-btn" onclick="setTab('settings')">⚙️ Settings</button>
+    </nav>
+  </div>
 </header>
 
-<main>
-  <!-- SEARCH TAB -->
-  <div id="tab-search">
-    <div class="card">
-      <div class="row">
-        <input type="text" id="searchInput" placeholder="Enter a word (e.g., ego, reluctant, brave)..." onkeydown="if(event.key==='Enter')doSearch()">
-        <button class="btn btn-pri" onclick="doSearch()">Search</button>
+<main class="main-container">
+  <!-- SEARCH & KNOWLEDGE BASE TAB -->
+  <div id="tab-search" class="tab-content active">
+    
+    <!-- Hero Header -->
+    <section class="hero-section">
+      <h2 class="hero-title">Master the English Language</h2>
+      <p class="hero-subtitle">Explore definitions, morphology, word families, visual networks, and inline translations in one clean space.</p>
+
+      
+      <div class="search-box-container">
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search any word (e.g., ego, benevolent, empathy)..." onkeydown="if(event.key==='Enter')doSearch()">
+          <button class="btn btn-primary" onclick="doSearch()">Search</button>
+        </div>
       </div>
-    </div>
-    <div id="searchResults"></div>
+    </section>
+
+    <!-- Search Results Dynamic Output -->
+    <div id="searchResults" class="results-container"></div>
   </div>
 
-  <!-- SAVED TAB -->
-  <div id="tab-saved" style="display:none;">
-    <div class="card">
-      <div class="row">
-        <input type="text" id="savedFilter" placeholder="Search saved words..." oninput="renderSaved()">
-        <button class="btn" onclick="exportData()">⬇ Export JSON</button>
+  <!-- SAVED DICTIONARY TAB -->
+  <div id="tab-saved" class="tab-content">
+    <div class="card shadow-sm">
+      <div class="card-header-row">
+        <h3>📚 My Personal Knowledge Base</h3>
+        <div class="card-actions">
+          <input type="text" id="savedFilter" placeholder="Filter saved words..." oninput="renderSaved()" class="filter-input">
+          <button class="btn btn-secondary" onclick="exportData()">⬇ Export JSON</button>
+        </div>
       </div>
     </div>
-    <div id="savedList"></div>
+    <div id="savedList" class="saved-grid"></div>
   </div>
 
   <!-- SETTINGS TAB -->
-  <div id="tab-settings" style="display:none;">
-    <div class="card">
-      <h3 style="margin-top:0">Translation Target Language</h3>
-      <select id="langSelect" onchange="updateSettings()">
-        <option value="hi">Hindi (हिन्दी)</option>
-        <option value="te">Telugu (తెలుగు)</option>
-        <option value="es">Spanish (Español)</option>
-        <option value="fr">French (Français)</option>
-        <option value="de">German (Deutsch)</option>
-      </select>
+  <div id="tab-settings" class="tab-content">
+    <div class="card shadow-sm">
+      <h3 class="card-title">⚙️ Platform Preferences</h3>
       
-      <h3>Show Inline Translations</h3>
-      <div class="row">
-        <label style="cursor:pointer; display:flex; align-items:center; gap:8px;">
-          <input type="checkbox" id="showTrlToggle" checked onchange="updateSettings()" style="width:auto;">
-          Automatically show machine translations under definitions and examples
+      <div class="setting-group">
+        <label for="langSelect" class="setting-label">Inline Translation Target Language</label>
+        <select id="langSelect" onchange="updateSettings()" class="select-input">
+          <option value="hi">Hindi (हिन्दी)</option>
+          <option value="te">Telugu (తెలుగు)</option>
+          <option value="es">Spanish (Español)</option>
+          <option value="fr">French (Français)</option>
+          <option value="de">German (Deutsch)</option>
+        </select>
+      </div>
+      
+      <div class="setting-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="showTrlToggle" checked onchange="updateSettings()">
+          <span>Automatically show inline machine translations under definitions and examples</span>
         </label>
       </div>
 
-      <h3>Appearance Theme</h3>
-      <div class="row">
-        <button class="btn" onclick="toggleTheme('light')">Light Mode</button>
-        <button class="btn" onclick="toggleTheme('dark')">Dark Mode</button>
+      <div class="setting-group">
+        <label class="setting-label">Theme Mode</label>
+        <div class="theme-buttons">
+          <button class="btn btn-outline" onclick="toggleTheme('light')">☀️ Light Mode</button>
+          <button class="btn btn-outline" onclick="toggleTheme('dark')">🌙 Dark Mode</button>
+        </div>
       </div>
     </div>
   </div>
 </main>
 
+<footer class="footer">
+  <div class="footer-container">
+    <p>WordHub Knowledge Platform — Powered by Open APIs & Web Standards</p>
+  </div>
+</footer>
+
 <script src="app.js"></script>
-<script>if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script>
+<script>
+  if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) {
+    addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  }
+</script>
 </body>
 </html>

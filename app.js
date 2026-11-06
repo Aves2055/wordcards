@@ -1,9 +1,10 @@
+/* WordHub Application Logic */
 let savedWords = JSON.parse(localStorage.getItem('wh_saved') || '[]');
 let settings = JSON.parse(localStorage.getItem('wh_cfg') || '{"lang":"hi","theme":"light","showTrl":true}');
 let translationCache = JSON.parse(localStorage.getItem('wh_tr_cache') || '{}');
 let currentResult = null;
 
-// Built-in word family nuances database
+// Built-in Word Family Nuances & Morphology Knowledge Base
 const WORD_FAMILIES = {
   ego: {
     base: "ego",
@@ -26,6 +27,16 @@ const WORD_FAMILIES = {
       { word: "sympathy", role: "concept", pos: "noun", desc: "Feeling pity or compassion for someone else's trouble." },
       { word: "apathy", role: "condition", pos: "noun", desc: "Complete lack of feeling, interest, or emotional concern." },
       { word: "antipathy", role: "concept", pos: "noun", desc: "A deep-seated, natural feeling of dislike or aversion." }
+    ]
+  },
+  bene: {
+    base: "bene",
+    summary: "Latin root meaning 'well' or 'good'. Forms words describing good actions, gifts, or kindness.",
+    members: [
+      { word: "benevolent", role: "attribute", pos: "adjective", desc: "Well-meaning, kindly, and generous in nature." },
+      { word: "benefactor", role: "person", pos: "noun", desc: "A person who gives financial or other help to a cause or person." },
+      { word: "benediction", role: "concept", pos: "noun", desc: "The utterance or bestowing of a blessing." },
+      { word: "beneficial", role: "attribute", pos: "adjective", desc: "Resulting in good; favorable or advantageous." }
     ]
   }
 };
@@ -54,8 +65,8 @@ function setTab(tab) {
   ['search', 'saved', 'settings'].forEach(t => {
     const tabEl = document.getElementById('tab-' + t);
     const navEl = document.getElementById('nav-' + t);
-    if(tabEl) tabEl.style.display = (t === tab) ? 'block' : 'none';
-    if(navEl) navEl.classList.toggle('on', t === tab);
+    if(tabEl) tabEl.classList.toggle('active', t === tab);
+    if(navEl) navEl.classList.toggle('active', t === tab);
   });
   if(tab === 'saved') renderSaved();
 }
@@ -92,14 +103,14 @@ async function fetchTranslation(text, lang) {
   return '';
 }
 
-// Main Lookup Function
+// Main Search & Knowledge Base Function
 async function doSearch(term) {
   const query = (term || document.getElementById('searchInput').value).trim().toLowerCase();
   if(!query) return;
   document.getElementById('searchInput').value = query;
   
   const container = document.getElementById('searchResults');
-  container.innerHTML = `<div class="card mute">Searching dictionary & analyzing connections for "<b>${query}</b>"...</div>`;
+  container.innerHTML = `<div class="card mute" style="text-align:center; padding:32px;">Analyzing structure, connections & definitions for "<b>${query}</b>"...</div>`;
   
   try {
     const [dictRes, synRes, antRes] = await Promise.allSettled([
@@ -123,13 +134,14 @@ async function doSearch(term) {
 
     renderResult(currentResult);
   } catch(e) {
-    container.innerHTML = `<div class="card">Could not load details for "${query}". Check network.</div>`;
+    container.innerHTML = `<div class="card">Could not load details for "${query}". Check your internet connection.</div>`;
   }
 }
 
 async function renderResult(res) {
   const isSaved = savedWords.some(w => w.word === res.word);
   
+  // Render Definitions & Inline Translations
   let defsHtml = '';
   if(res.meanings.length) {
     for (const m of res.meanings.slice(0, 3)) {
@@ -148,7 +160,7 @@ async function renderResult(res) {
       }
       
       defsHtml += `
-        <div class="def-box">
+        <div class="def-box" style="border-bottom:1px solid var(--line); padding:14px 0;">
           <span class="pos-tag">${m.partOfSpeech}</span>
           <div style="font-size:15px; font-weight:500;">${firstDef.definition}</div>
           ${trDefHtml}
@@ -157,9 +169,10 @@ async function renderResult(res) {
       `;
     }
   } else {
-    defsHtml = `<div class="mute" style="padding:10px 0;">No direct dictionary definition found, but related terms are shown below.</div>`;
+    defsHtml = `<div class="mute" style="padding:12px 0;">No direct dictionary definition found, but related terms are shown below.</div>`;
   }
 
+  // Find Connections with Saved Words
   const linkedSaved = savedWords.filter(w => {
     if(w.word === res.word) return false;
     const isSyn = res.synonyms.includes(w.word) || (w.synonyms && w.synonyms.includes(res.word));
@@ -168,19 +181,21 @@ async function renderResult(res) {
     return isSyn || isAnt || isFam;
   });
 
+  // Check Word Family Nuance Data
   const familyKey = Object.keys(WORD_FAMILIES).find(k => res.word.startsWith(k) || WORD_FAMILIES[k].members.some(m=>m.word===res.word));
   const familyData = familyKey ? WORD_FAMILIES[familyKey] : null;
 
   document.getElementById('searchResults').innerHTML = `
+    <!-- Header Snapshot Card -->
     <div class="card">
       <div class="row" style="justify-content:space-between">
         <div>
-          <h2 style="margin:0; font-size:26px; font-weight:800;">${res.word}</h2>
+          <h2 style="margin:0; font-size:28px; font-weight:800;">${res.word}</h2>
           <span class="mute">${res.phonetic}</span>
         </div>
         <div class="row">
-          ${res.audio ? `<button class="btn" onclick="new Audio('${res.audio}').play()">🔊 Pronounce</button>` : ''}
-          <button class="btn ${isSaved?'':'btn-pri'}" onclick="toggleSaveCurrent()">
+          ${res.audio ? `<button class="btn btn-secondary" onclick="new Audio('${res.audio}').play()">🔊 Pronounce</button>` : ''}
+          <button class="btn ${isSaved?'':'btn-primary'}" onclick="toggleSaveCurrent()">
             ${isSaved ? 'Saved ✓' : '+ Save Word'}
           </button>
         </div>
@@ -188,10 +203,11 @@ async function renderResult(res) {
       <div style="margin-top:14px;">${defsHtml}</div>
     </div>
 
+    <!-- Word Family & Nuance Breakdown Card -->
     ${familyData ? `
       <div class="card" style="border-left: 4px solid var(--acc);">
         <h3 style="margin-top:0; color:var(--acc);">💡 Word Family & Nuance Breakdown</h3>
-        <p class="mute" style="margin-bottom:10px;">${familyData.summary}</p>
+        <p class="mute" style="margin-bottom:12px;">${familyData.summary}</p>
         <div class="nuance-grid">
           ${familyData.members.map(m => `
             <div class="nuance-card" style="${m.word===res.word?'border-color:var(--acc); background:var(--accb);':''}">
@@ -206,21 +222,23 @@ async function renderResult(res) {
       </div>
     ` : ''}
 
+    <!-- Synonyms & Antonyms Card -->
     <div class="card">
       <h3 style="margin-top:0">Synonyms & Antonyms</h3>
       <div>
         <b>Synonyms: </b>
         ${res.synonyms.map(s => `<span class="pill ok" onclick="doSearch('${s}')">${s}</span>`).join('') || '<span class="mute">None</span>'}
       </div>
-      <div style="margin-top:8px;">
+      <div style="margin-top:10px;">
         <b>Antonyms: </b>
         ${res.antonyms.map(a => `<span class="pill bad" onclick="doSearch('${a}')">${a}</span>`).join('') || '<span class="mute">None</span>'}
       </div>
     </div>
 
+    <!-- Color-Coded Connection Graph -->
     <div class="card">
-      <h3 style="margin-top:0">Visual Connection Graph (Saved Dictionary Links)</h3>
-      <p class="mute" style="margin-top:-6px; margin-bottom:12px;">Shows how <b>${res.word}</b> links to words in your saved dictionary database.</p>
+      <h3 style="margin-top:0">Visual Connection Graph (Saved Dictionary Network)</h3>
+      <p class="mute" style="margin-top:-6px; margin-bottom:12px;">Shows how <b>${res.word}</b> links to existing terms in your personal knowledge base.</p>
       ${renderConnectionMap(res, linkedSaved)}
     </div>
   `;
@@ -228,7 +246,7 @@ async function renderResult(res) {
 
 function renderConnectionMap(centerRes, linkedItems) {
   if(!linkedItems.length) {
-    return `<div class="mute" style="padding:20px; text-align:center; background:var(--bg); border-radius:10px;">No direct links found with your current saved dictionary. Save more related words to build your network!</div>`;
+    return `<div class="mute" style="padding:24px; text-align:center; background:var(--bg); border-radius:10px;">No direct links found with your current saved dictionary. Save more related words to build your network!</div>`;
   }
   
   let svg = `<svg viewBox="0 0 440 240">`;
@@ -297,13 +315,13 @@ function renderSaved() {
   const list = savedWords.filter(w => w.word.toLowerCase().includes(filter));
   
   const html = list.map(w => `
-    <div class="card">
+    <div class="card" style="margin-bottom:12px;">
       <div class="row" style="justify-content:space-between">
         <div>
           <h3 style="margin:0; font-size:18px; color:var(--acc); cursor:pointer;" onclick="setTab('search'); doSearch('${w.word}')">${w.word}</h3>
           <div class="mute" style="margin-top:4px;">${w.meanings[0]?.definitions[0]?.definition || 'No definition saved.'}</div>
         </div>
-        <button class="btn" onclick="removeSaved('${w.word}')">Remove</button>
+        <button class="btn btn-outline" onclick="removeSaved('${w.word}')">Remove</button>
       </div>
     </div>
   `).join('');
@@ -321,7 +339,7 @@ function exportData() {
   const blob = new Blob([JSON.stringify(savedWords, null, 2)], {type: 'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'my-word-hub-backup.json';
+  a.download = 'wordhub-knowledge-base.json';
   a.click();
 }
 
