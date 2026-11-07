@@ -1,11 +1,11 @@
 {
- "name": "My Word Cards",
- "short_name": "Word Cards",
+ "name": "WordHub — English Knowledge Platform",
+ "short_name": "WordHub",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
- "background_color": "#f4f2ec",
- "theme_color": "#2f5d50",
+ "background_color": "#f4f6fb",
+ "theme_color": "#2563eb",
  "icons": [
   {
    "src": "icon-192.png",

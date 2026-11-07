@@ -1,130 +1,145 @@
-/* WordHub Application Logic */
-let savedWords = JSON.parse(localStorage.getItem('wh_saved') || '[]');
-let settings = JSON.parse(localStorage.getItem('wh_cfg') || '{"lang":"hi","theme":"light","showTrl":true}');
-let translationCache = JSON.parse(localStorage.getItem('wh_tr_cache') || '{}');
-let currentResult = null;
+/* WordHub Master Application Engine */
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const LS = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const SV = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const JD = (k, d) => { try { return JSON.parse(LS(k)) || d; } catch (e) { return d; } };
 
-// Built-in Word Family Nuances & Morphology Knowledge Base
-const WORD_FAMILIES = {
-  ego: {
-    base: "ego",
-    summary: "Roots centered around 'self' or 'I'. The distinction lies in whether it describes internal self-identity, self-serving actions, verbal boastfulness, or obsessive psychological fixation.",
-    members: [
-      { word: "ego", role: "concept", pos: "noun", desc: "Your sense of self-esteem and identity. Neutral by itself." },
-      { word: "egoist", role: "person", pos: "noun", desc: "A self-centered person whose ACTIONS always put their own interest first." },
-      { word: "egotist", role: "person", pos: "noun", desc: "A boastful person who SPEAKS constantly about themselves and brags." },
-      { word: "egoism", role: "concept", pos: "noun", desc: "The ethical theory or practice of acting solely in one's self-interest." },
-      { word: "egotism", role: "concept", pos: "noun", desc: "Excessive self-importance and non-stop talk about oneself." },
-      { word: "egomaniac", role: "condition", pos: "noun", desc: "A person with an extreme, obsessive fixation on their own power/importance." },
-      { word: "egomaniacal", role: "attribute", pos: "adjective", desc: "Exhibiting morbidly excessive self-centeredness or mania." }
-    ]
-  },
-  empathy: {
-    base: "path",
-    summary: "Words derived from 'pathos' (feeling/suffering). Differ by how emotional connection is shared or felt.",
-    members: [
-      { word: "empathy", role: "concept", pos: "noun", desc: "Truly understanding and sharing another's feelings from their perspective." },
-      { word: "sympathy", role: "concept", pos: "noun", desc: "Feeling pity or compassion for someone else's trouble." },
-      { word: "apathy", role: "condition", pos: "noun", desc: "Complete lack of feeling, interest, or emotional concern." },
-      { word: "antipathy", role: "concept", pos: "noun", desc: "A deep-seated, natural feeling of dislike or aversion." }
-    ]
-  },
-  bene: {
-    base: "bene",
-    summary: "Latin root meaning 'well' or 'good'. Forms words describing good actions, gifts, or kindness.",
-    members: [
-      { word: "benevolent", role: "attribute", pos: "adjective", desc: "Well-meaning, kindly, and generous in nature." },
-      { word: "benefactor", role: "person", pos: "noun", desc: "A person who gives financial or other help to a cause or person." },
-      { word: "benediction", role: "concept", pos: "noun", desc: "The utterance or bestowing of a blessing." },
-      { word: "beneficial", role: "attribute", pos: "adjective", desc: "Resulting in good; favorable or advantageous." }
-    ]
-  }
-};
+let words = JD("wh_words", []);
+let cfg = Object.assign({ theme: "auto", lang: "hi", voice: "en-US", rate: "0.9" }, JD("wh_cfg", {}));
+let translationCache = JD("wh_tr_cache", {});
+let currentTab = "home";
+let practicePhase = "beginner";
+let currentQuiz = null;
 
-function saveStorage() {
-  localStorage.setItem('wh_saved', JSON.stringify(savedWords));
-  localStorage.setItem('wh_cfg', JSON.stringify(settings));
-  localStorage.setItem('wh_tr_cache', JSON.stringify(translationCache));
-  updateSavedCount();
+function toast(t) {
+  const e = $("toast");
+  if (!e) return;
+  e.textContent = t;
+  e.classList.add("on");
+  setTimeout(() => e.classList.remove("on"), 1800);
 }
 
-function updateSavedCount() {
-  const el = document.getElementById('saved-count');
-  if(el) el.textContent = savedWords.length;
+function say(text) {
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = cfg.voice;
+    u.rate = parseFloat(cfg.rate) || 0.9;
+    speechSynthesis.speak(u);
+  } catch (e) {
+    toast("Voice synthesis unavailable");
+  }
 }
 
 function applyTheme() {
-  document.documentElement.dataset.t = settings.theme === 'dark' ? 'd' : 'l';
-  const langEl = document.getElementById('langSelect');
-  if(langEl) langEl.value = settings.lang || 'hi';
-  const trlEl = document.getElementById('showTrlToggle');
-  if(trlEl) trlEl.checked = settings.showTrl !== false;
+  const d = cfg.theme === "dark" || (cfg.theme === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
+  document.documentElement.dataset.t = d ? "d" : "l";
 }
 
 function setTab(tab) {
-  ['search', 'saved', 'settings'].forEach(t => {
-    const tabEl = document.getElementById('tab-' + t);
-    const navEl = document.getElementById('nav-' + t);
-    if(tabEl) tabEl.classList.toggle('active', t === tab);
-    if(navEl) navEl.classList.toggle('active', t === tab);
-  });
-  if(tab === 'saved') renderSaved();
+  currentTab = tab;
+  render();
+  window.scrollTo(0, 0);
 }
 
-function toggleTheme(t) {
-  settings.theme = t;
-  saveStorage();
-  applyTheme();
+// Built-in Practice Bank for Random Web-Pushed Tests
+const PRACTICE_BANK = {
+  beginner: [
+    { type: "blank", word: "brave", question: "The ___ firefighter entered the burning building.", opts: ["brave", "timid", "fragile", "reluctant"], ans: "brave", pos: "Adjective", def: "Ready to face danger without fear." },
+    { type: "blank", word: "polite", question: "It is always ___ to say thank you.", opts: ["polite", "hostile", "rude", "harsh"], ans: "polite", pos: "Adjective", def: "Having or showing good manners." },
+    { type: "pos", word: "gather", question: "What part of speech is 'gather' in: 'Please gather your books.'?", opts: ["Verb", "Noun", "Adjective", "Adverb"], ans: "Verb", pos: "Verb", def: "To bring together in one place." },
+    { type: "syn", word: "rapid", question: "Which word is a synonym for 'rapid'?", opts: ["quick", "slow", "heavy", "clumsy"], ans: "quick", pos: "Adjective", def: "Happening or moving with great speed." }
+  ],
+  intermediate: [
+    { type: "blank", word: "diligent", question: "A ___ student revises their notes every evening.", opts: ["diligent", "careless", "slothful", "vague"], ans: "diligent", pos: "Adjective", def: "Showing care and effort in work." },
+    { type: "syn", word: "ambiguous", question: "Which word is closest in meaning to 'ambiguous'?", opts: ["unclear", "precise", "definite", "obvious"], ans: "unclear", pos: "Adjective", def: "Open to more than one interpretation." },
+    { type: "ant", word: "scarce", question: "Which word is the opposite of 'scarce'?", opts: ["abundant", "rare", "few", "limited"], ans: "abundant", pos: "Adjective", def: "Insufficient to satisfy the need or demand." }
+  ],
+  hard: [
+    { type: "blank", word: "ephemeral", question: "Fame in the digital age is often ___, lasting only a few days.", opts: ["ephemeral", "permanent", "enduring", "eternal"], ans: "ephemeral", pos: "Adjective", def: "Lasting for a very short time." },
+    { type: "syn", word: "ubiquitous", question: "Which word means 'found everywhere'?", opts: ["ubiquitous", "isolated", "sparse", "hidden"], ans: "ubiquitous", pos: "Adjective", def: "Present, appearing, or found everywhere." },
+    { type: "pos", word: "sycophant", question: "Identify the part of speech for 'sycophant'.", opts: ["Noun", "Verb", "Adjective", "Preposition"], ans: "Noun", pos: "Noun", def: "A person who acts obsequiously toward someone important to gain advantage." }
+  ]
+};
+
+// Grammar Notes Data for "Learn" Tab
+const GRAMMAR_NOTES = [
+  { title: "Tenses Overview", desc: "Understand Past, Present, and Future sentence structures.", content: "Tenses express the time of action. <br><b>Present Simple:</b> Habits/facts (<i>'She writes every day.'</i>)<br><b>Past Simple:</b> Completed past events (<i>'She wrote yesterday.'</i>)<br><b>Future Simple:</b> Intentions (<i>'She will write tomorrow.'</i>)" },
+  { title: "Modal Verbs", desc: "Master 'Can', 'Could', 'May', 'Might', 'Must', 'Should'.", content: "Modal verbs express necessity, permission, ability, or possibility.<br><b>Ability:</b> Can / Could<br><b>Permission:</b> May / Can<br><b>Obligation:</b> Must / Should" },
+  { title: "Prepositions of Place & Time", desc: "Using 'In', 'On', 'At' correctly.", content: "<b>AT:</b> Specific times or points (<i>at 5 PM, at the door</i>).<br><b>ON:</b> Days and surfaces (<i>on Monday, on the table</i>).<br><b>IN:</b> Months, years, enclosed spaces (<i>in July, in the room</i>)." },
+  { title: "Articles (A, An, The)", desc: "Definite vs. Indefinite usage rules.", content: "<b>A / AN:</b> Indefinite (singular countable nouns). Use <b>An</b> before vowel sounds.<br><b>THE:</b> Definite (specific items known to listener/reader)." }
+];
+
+// Views Renders
+function renderHome() {
+  return `
+    <div class="card hero-card">
+      <h2>Welcome to WordHub 👋</h2>
+      <p class="mute">Master English vocabulary, explore morphology, practice random quizzes, and study comprehensive grammar notes.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box"><b>${words.length}</b>Saved Words</div>
+      <div class="stat-box"><b>4 Tiers</b>Grammar Notes</div>
+      <div class="stat-box"><b>3 Levels</b>Practice Hub</div>
+    </div>
+
+    <div class="card">
+      <h3>🔍 Quick Word Search</h3>
+      <div class="row">
+        <input type="text" id="homeSearchInput" placeholder="Search any English word..." class="grow" onkeydown="if(event.key==='Enter') doSearch($('homeSearchInput').value)">
+        <button class="pri" onclick="doSearch($('homeSearchInput').value)">Search</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🚀 Quick Navigation</h3>
+      <div class="row">
+        <button onclick="setTab('search')">🔍 Word Search</button>
+        <button onclick="setTab('practice')">🎯 Practice Hub</button>
+        <button onclick="setTab('learn')">📖 Grammar Notes</button>
+        <button onclick="setTab('saved')">📚 My Saved Deck</button>
+      </div>
+    </div>
+  `;
 }
 
-function updateSettings() {
-  settings.lang = document.getElementById('langSelect').value;
-  settings.showTrl = document.getElementById('showTrlToggle').checked;
-  saveStorage();
-  if(currentResult) renderResult(currentResult);
+function renderSearch() {
+  return `
+    <h2>Word Search & Insights</h2>
+    <div class="card">
+      <div class="row">
+        <input type="text" id="searchInput" placeholder="Type a word (e.g. ego, brave, diligent)..." class="grow" onkeydown="if(event.key==='Enter') doSearch($('searchInput').value)">
+        <button class="pri" onclick="doSearch($('searchInput').value)">Search</button>
+      </div>
+    </div>
+    <div id="searchResults"></div>
+  `;
 }
 
-// Inline Translation Fetcher (MyMemory)
-async function fetchTranslation(text, lang) {
-  if(!text || lang === 'en') return '';
-  const key = `${lang}:${text.trim().toLowerCase()}`;
-  if(translationCache[key]) return translationCache[key];
-  
-  try {
-    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.slice(0, 300))}&langpair=en|${lang}`);
-    const data = await res.json();
-    const tr = data?.responseData?.translatedText;
-    if(tr && !/MYMEMORY WARNING|INVALID/i.test(tr)) {
-      translationCache[key] = tr;
-      saveStorage();
-      return tr;
-    }
-  } catch(e) {}
-  return '';
-}
-
-// Main Search & Knowledge Base Function
 async function doSearch(term) {
-  const query = (term || document.getElementById('searchInput').value).trim().toLowerCase();
-  if(!query) return;
-  document.getElementById('searchInput').value = query;
-  
-  const container = document.getElementById('searchResults');
-  container.innerHTML = `<div class="card mute" style="text-align:center; padding:32px;">Analyzing structure, connections & definitions for "<b>${query}</b>"...</div>`;
-  
+  if (!term || !term.trim()) return;
+  const q = term.trim().toLowerCase();
+  setTab('search');
+  const container = $('searchResults');
+  if (!container) return;
+
+  container.innerHTML = `<div class="card mute">Searching live dictionary data for "<b>${esc(q)}</b>"...</div>`;
+
   try {
     const [dictRes, synRes, antRes] = await Promise.allSettled([
-      fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(query)}`).then(r => r.ok ? r.json() : null),
-      fetch(`https://api.datamuse.com/words?rel_syn=${encodeURIComponent(query)}&max=8`).then(r => r.json()),
-      fetch(`https://api.datamuse.com/words?rel_ant=${encodeURIComponent(query)}&max=6`).then(r => r.json())
+      fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(q)}`).then(r => r.ok ? r.json() : null),
+      fetch(`https://api.datamuse.com/words?rel_syn=${encodeURIComponent(q)}&max=8`).then(r => r.json()),
+      fetch(`https://api.datamuse.com/words?rel_ant=${encodeURIComponent(q)}&max=6`).then(r => r.json())
     ]);
-    
+
     const entry = (dictRes.status === 'fulfilled' && Array.isArray(dictRes.value)) ? dictRes.value[0] : null;
     const synonyms = synRes.status === 'fulfilled' ? synRes.value.map(x => x.word) : [];
     const antonyms = antRes.status === 'fulfilled' ? antRes.value.map(x => x.word) : [];
-    
-    currentResult = {
-      word: query,
+
+    const res = {
+      word: q,
       phonetic: entry?.phonetic || (entry?.phonetics?.find(p=>p.text)?.text) || '',
       audio: entry?.phonetics?.find(p=>p.audio)?.audio || '',
       meanings: entry?.meanings || [],
@@ -132,218 +147,224 @@ async function doSearch(term) {
       antonyms: [...new Set(antonyms)]
     };
 
-    renderResult(currentResult);
+    renderSearchResult(res);
   } catch(e) {
-    container.innerHTML = `<div class="card">Could not load details for "${query}". Check your internet connection.</div>`;
+    container.innerHTML = `<div class="card">Could not load details for "${esc(q)}". Please check network connection.</div>`;
   }
 }
 
-async function renderResult(res) {
-  const isSaved = savedWords.some(w => w.word === res.word);
-  
-  // Render Definitions & Inline Translations
+function renderSearchResult(res) {
+  const container = $('searchResults');
+  const isSaved = words.some(w => w.word === res.word);
+
   let defsHtml = '';
-  if(res.meanings.length) {
-    for (const m of res.meanings.slice(0, 3)) {
-      const firstDef = m.definitions[0];
-      if(!firstDef) continue;
-      
-      let trDefHtml = '', trExHtml = '';
-      if(settings.showTrl) {
-        const trDef = await fetchTranslation(firstDef.definition, settings.lang);
-        if(trDef) trDefHtml = `<div class="inline-trl"><small>${settings.lang}</small> ${trDef}</div>`;
-        
-        if(firstDef.example) {
-          const trEx = await fetchTranslation(firstDef.example, settings.lang);
-          if(trEx) trExHtml = `<div class="inline-trl"><small>${settings.lang}</small> ${trEx}</div>`;
-        }
+  if (res.meanings.length) {
+    res.meanings.forEach(m => {
+      const d = m.definitions[0];
+      if (d) {
+        defsHtml += `
+          <div class="def">
+            <span class="tag">${esc(m.partOfSpeech)}</span>
+            <div style="font-weight:600; margin-top:4px;">${esc(d.definition)}</div>
+            ${d.example ? `<div class="ex">"${esc(d.example)}"</div>` : ''}
+          </div>
+        `;
       }
-      
-      defsHtml += `
-        <div class="def-box" style="border-bottom:1px solid var(--line); padding:14px 0;">
-          <span class="pos-tag">${m.partOfSpeech}</span>
-          <div style="font-size:15px; font-weight:500;">${firstDef.definition}</div>
-          ${trDefHtml}
-          ${firstDef.example ? `<div class="ex">"${firstDef.example}"</div>${trExHtml}` : ''}
-        </div>
-      `;
-    }
+    });
   } else {
-    defsHtml = `<div class="mute" style="padding:12px 0;">No direct dictionary definition found, but related terms are shown below.</div>`;
+    defsHtml = `<div class="mute">No direct dictionary entry found. Related terms shown below.</div>`;
   }
 
-  // Find Connections with Saved Words
-  const linkedSaved = savedWords.filter(w => {
-    if(w.word === res.word) return false;
-    const isSyn = res.synonyms.includes(w.word) || (w.synonyms && w.synonyms.includes(res.word));
-    const isAnt = res.antonyms.includes(w.word) || (w.antonyms && w.antonyms.includes(res.word));
-    const isFam = w.word.slice(0, 4) === res.word.slice(0, 4);
-    return isSyn || isAnt || isFam;
-  });
-
-  // Check Word Family Nuance Data
-  const familyKey = Object.keys(WORD_FAMILIES).find(k => res.word.startsWith(k) || WORD_FAMILIES[k].members.some(m=>m.word===res.word));
-  const familyData = familyKey ? WORD_FAMILIES[familyKey] : null;
-
-  document.getElementById('searchResults').innerHTML = `
-    <!-- Header Snapshot Card -->
+  container.innerHTML = `
     <div class="card">
-      <div class="row" style="justify-content:space-between">
+      <div class="row" style="justify-content:space-between;">
         <div>
-          <h2 style="margin:0; font-size:28px; font-weight:800;">${res.word}</h2>
-          <span class="mute">${res.phonetic}</span>
+          <h2 style="margin:0;">${esc(res.word)}</h2>
+          <span class="mute">${esc(res.phonetic)}</span>
         </div>
         <div class="row">
-          ${res.audio ? `<button class="btn btn-secondary" onclick="new Audio('${res.audio}').play()">🔊 Pronounce</button>` : ''}
-          <button class="btn ${isSaved?'':'btn-primary'}" onclick="toggleSaveCurrent()">
+          ${res.audio ? `<button class="sm" onclick="new Audio('${res.audio}').play()">🔊 Pronounce</button>` : `<button class="sm" onclick="say('${res.word}')">🔊 Pronounce</button>`}
+          <button class="sm ${isSaved ? '' : 'pri'}" onclick="toggleSaveWord('${esc(res.word)}', '${esc(res.meanings[0]?.definitions[0]?.definition || '')}')">
             ${isSaved ? 'Saved ✓' : '+ Save Word'}
           </button>
         </div>
       </div>
-      <div style="margin-top:14px;">${defsHtml}</div>
+      <div style="margin-top:16px;">${defsHtml}</div>
     </div>
 
-    <!-- Word Family & Nuance Breakdown Card -->
-    ${familyData ? `
-      <div class="card" style="border-left: 4px solid var(--acc);">
-        <h3 style="margin-top:0; color:var(--acc);">💡 Word Family & Nuance Breakdown</h3>
-        <p class="mute" style="margin-bottom:12px;">${familyData.summary}</p>
-        <div class="nuance-grid">
-          ${familyData.members.map(m => `
-            <div class="nuance-card" style="${m.word===res.word?'border-color:var(--acc); background:var(--accb);':''}">
-              <div class="row" style="justify-content:space-between; margin-bottom:6px;">
-                <b onclick="doSearch('${m.word}')">${m.word}</b>
-                <span class="badge ${m.role}">${m.role}</span>
-              </div>
-              <div style="font-size:13px;">${m.desc}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    ` : ''}
-
-    <!-- Synonyms & Antonyms Card -->
-    <div class="card">
-      <h3 style="margin-top:0">Synonyms & Antonyms</h3>
-      <div>
+    <details open class="card">
+      <summary>Synonyms &amp; Antonyms Accordion</summary>
+      <div style="margin-top:12px;">
         <b>Synonyms: </b>
-        ${res.synonyms.map(s => `<span class="pill ok" onclick="doSearch('${s}')">${s}</span>`).join('') || '<span class="mute">None</span>'}
+        ${res.synonyms.map(s => `<span class="pill ok" onclick="doSearch('${esc(s)}')">${esc(s)}</span>`).join('') || '<span class="mute">None found</span>'}
       </div>
-      <div style="margin-top:10px;">
+      <div style="margin-top:12px;">
         <b>Antonyms: </b>
-        ${res.antonyms.map(a => `<span class="pill bad" onclick="doSearch('${a}')">${a}</span>`).join('') || '<span class="mute">None</span>'}
+        ${res.antonyms.map(a => `<span class="pill bad" onclick="doSearch('${esc(a)}')">${esc(a)}</span>`).join('') || '<span class="mute">None found</span>'}
+      </div>
+    </details>
+  `;
+}
+
+function toggleSaveWord(word, def) {
+  const idx = words.findIndex(w => w.word === word);
+  if (idx >= 0) {
+    words.splice(idx, 1);
+    toast("Word removed from deck");
+  } else {
+    words.push({ word, def, added: Date.now() });
+    toast("Word saved to deck ✓");
+  }
+  SV("wh_words", words);
+  doSearch(word);
+}
+
+function renderPractice() {
+  if (!currentQuiz) {
+    return `
+      <h2>Practice Hub (3 Difficulty Phases)</h2>
+      <div class="card">
+        <h3>Select Difficulty Tier</h3>
+        <div class="row">
+          <button class="pill ${practicePhase === 'beginner' ? 'on' : ''}" onclick="setPhase('beginner')">🟢 Beginner</button>
+          <button class="pill ${practicePhase === 'intermediate' ? 'on' : ''}" onclick="setPhase('intermediate')">🟡 Intermediate</button>
+          <button class="pill ${practicePhase === 'hard' ? 'on' : ''}" onclick="setPhase('hard')">🔴 Hard</button>
+        </div>
+        <p class="mute" style="margin-top:12px;">Includes fill-in-the-blanks, synonym matching, and parts-of-speech questions generated automatically.</p>
+        <button class="pri" style="margin-top:10px;" onclick="startQuiz()">Start ${practicePhase.toUpperCase()} Quiz</button>
+      </div>
+    `;
+  }
+
+  const q = currentQuiz.list[currentQuiz.index];
+  return `
+    <h2>Practice Hub — ${practicePhase.toUpperCase()}</h2>
+    <div class="card">
+      <div class="mute">Question ${currentQuiz.index + 1} of ${currentQuiz.list.length}</div>
+      <h3 style="font-size:18px; margin-top:8px;">${esc(q.question)}</h3>
+      <div class="row" style="flex-direction:column; align-items:stretch;">
+        ${q.opts.map(o => `<button class="pill" style="text-align:left; padding:12px 16px;" onclick="checkAnswer('${esc(o)}', '${esc(q.ans)}')">${esc(o)}</button>`).join('')}
       </div>
     </div>
-
-    <!-- Color-Coded Connection Graph -->
-    <div class="card">
-      <h3 style="margin-top:0">Visual Connection Graph (Saved Dictionary Network)</h3>
-      <p class="mute" style="margin-top:-6px; margin-bottom:12px;">Shows how <b>${res.word}</b> links to existing terms in your personal knowledge base.</p>
-      ${renderConnectionMap(res, linkedSaved)}
-    </div>
   `;
 }
 
-function renderConnectionMap(centerRes, linkedItems) {
-  if(!linkedItems.length) {
-    return `<div class="mute" style="padding:24px; text-align:center; background:var(--bg); border-radius:10px;">No direct links found with your current saved dictionary. Save more related words to build your network!</div>`;
-  }
-  
-  let svg = `<svg viewBox="0 0 440 240">`;
-  const cx = 220, cy = 120, R = 85;
-  
-  linkedItems.slice(0, 8).forEach((item, i) => {
-    const angle = (2 * Math.PI * i) / Math.min(8, linkedItems.length);
-    const x = cx + R * Math.cos(angle);
-    const y = cy + R * Math.sin(angle);
-    
-    const isSyn = centerRes.synonyms.includes(item.word);
-    const isAnt = centerRes.antonyms.includes(item.word);
-    
-    let strokeColor = 'var(--acc)';
-    let strokeDash = '';
-    let nodeBg = 'var(--accb)';
-    let nodeColor = 'var(--acc)';
-    
-    if(isSyn) {
-      strokeColor = 'var(--ok)';
-      nodeBg = 'var(--okb)';
-      nodeColor = 'var(--ok)';
-    } else if(isAnt) {
-      strokeColor = 'var(--bad)';
-      strokeDash = 'stroke-dasharray="4"';
-      nodeBg = 'var(--badb)';
-      nodeColor = 'var(--bad)';
-    }
-    
-    svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${strokeColor}" ${strokeDash} stroke-width="2.5" opacity="0.8"/>`;
-    svg += `<g onclick="doSearch('${item.word}')" style="cursor:pointer">`;
-    svg += `<circle cx="${x}" cy="${y}" r="22" fill="${nodeBg}" stroke="${strokeColor}" stroke-width="1.5"/>`;
-    svg += `<text x="${x}" y="${y+4}" text-anchor="middle" font-size="11" font-weight="600" fill="${nodeColor}">${item.word.length>7?item.word.slice(0,6)+'..':item.word}</text>`;
-    svg += `</g>`;
-  });
-  
-  svg += `<circle cx="${cx}" cy="${cy}" r="30" fill="var(--acc)" stroke="var(--card)" stroke-width="3"/>`;
-  svg += `<text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="13" fill="var(--on)" font-weight="bold">${centerRes.word.length>8?centerRes.word.slice(0,7)+'..':centerRes.word}</text>`;
-  svg += `</svg>`;
-  
-  const legend = `
-    <div class="legend">
-      <span><span class="legend-dot" style="background:var(--ok)"></span> Green = Synonym</span>
-      <span><span class="legend-dot" style="background:var(--bad)"></span> Red (Dashed) = Antonym</span>
-      <span><span class="legend-dot" style="background:var(--acc)"></span> Blue = Family Root</span>
-    </div>
-  `;
-  
-  return svg + legend;
+function setPhase(p) {
+  practicePhase = p;
+  render();
 }
 
-function toggleSaveCurrent() {
-  if(!currentResult) return;
-  const idx = savedWords.findIndex(w => w.word === currentResult.word);
-  if(idx >= 0) {
-    savedWords.splice(idx, 1);
+function startQuiz() {
+  const list = PRACTICE_BANK[practicePhase] || PRACTICE_BANK.beginner;
+  currentQuiz = { index: 0, score: 0, list };
+  render();
+}
+
+function checkAnswer(selected, correct) {
+  if (selected === correct) {
+    toast("Correct! 🎉");
+    currentQuiz.score++;
   } else {
-    savedWords.push(currentResult);
+    toast(`Incorrect! Answer: ${correct}`);
   }
-  saveStorage();
-  renderResult(currentResult);
+  currentQuiz.index++;
+  if (currentQuiz.index >= currentQuiz.list.length) {
+    alert(`Quiz Complete! Score: ${currentQuiz.score} / ${currentQuiz.list.length}`);
+    currentQuiz = null;
+  }
+  render();
+}
+
+function renderLearn() {
+  return `
+    <h2>English Grammar &amp; Concept Notes</h2>
+    <p class="mute">Simple, interactive reference notes for core English mechanics.</p>
+    ${GRAMMAR_NOTES.map(n => `
+      <details class="card">
+        <summary>${esc(n.title)}</summary>
+        <p class="mute">${esc(n.desc)}</p>
+        <div style="margin-top:10px; font-size:14.5px;">${n.content}</div>
+      </details>
+    `).join('')}
+  `;
 }
 
 function renderSaved() {
-  const filter = document.getElementById('savedFilter').value.toLowerCase();
-  const list = savedWords.filter(w => w.word.toLowerCase().includes(filter));
-  
-  const html = list.map(w => `
-    <div class="card" style="margin-bottom:12px;">
-      <div class="row" style="justify-content:space-between">
-        <div>
-          <h3 style="margin:0; font-size:18px; color:var(--acc); cursor:pointer;" onclick="setTab('search'); doSearch('${w.word}')">${w.word}</h3>
-          <div class="mute" style="margin-top:4px;">${w.meanings[0]?.definitions[0]?.definition || 'No definition saved.'}</div>
+  return `
+    <h2>My Saved Deck (${words.length})</h2>
+    ${words.length ? words.map(w => `
+      <div class="card">
+        <div class="row" style="justify-content:space-between;">
+          <div>
+            <b style="font-size:18px; color:var(--acc); cursor:pointer;" onclick="doSearch('${esc(w.word)}')">${esc(w.word)}</b>
+            <div class="mute" style="margin-top:4px;">${esc(w.def || 'Saved word')}</div>
+          </div>
+          <button class="sm" onclick="toggleSaveWord('${esc(w.word)}', ''); render();">Remove</button>
         </div>
-        <button class="btn btn-outline" onclick="removeSaved('${w.word}')">Remove</button>
+      </div>
+    `).join('') : '<div class="card mute">No saved words yet. Use Search to add words.</div>'}
+  `;
+}
+
+function renderSettings() {
+  return `
+    <h2>Platform Preferences</h2>
+    <div class="card">
+      <h3>Appearance Theme</h3>
+      <div class="row">
+        <button class="pill ${cfg.theme === 'light' ? 'on' : ''}" onclick="setTheme('light')">☀️ Light</button>
+        <button class="pill ${cfg.theme === 'dark' ? 'on' : ''}" onclick="setTheme('dark')">🌙 Dark</button>
+        <button class="pill ${cfg.theme === 'auto' ? 'on' : ''}" onclick="setTheme('auto')">🔄 Auto System</button>
       </div>
     </div>
-  `).join('');
-  
-  document.getElementById('savedList').innerHTML = html || '<div class="card mute">No saved words found.</div>';
+  `;
 }
 
-function removeSaved(word) {
-  savedWords = savedWords.filter(w => w.word !== word);
-  saveStorage();
-  renderSaved();
+function setTheme(t) {
+  cfg.theme = t;
+  SV("wh_cfg", cfg);
+  applyTheme();
+  render();
 }
 
-function exportData() {
-  const blob = new Blob([JSON.stringify(savedWords, null, 2)], {type: 'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'wordhub-knowledge-base.json';
-  a.click();
+function render() {
+  applyTheme();
+  const main = $('main');
+  const sb = $('sb');
+  const bn = $('bn');
+
+  // Sidebar Links
+  if (sb) {
+    sb.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.go === currentTab);
+    });
+  }
+
+  // Mobile Nav Links
+  if (bn) {
+    bn.innerHTML = `
+      <button class="${currentTab === 'home' ? 'active' : ''}" onclick="setTab('home')"><span>🏠</span>Home</button>
+      <button class="${currentTab === 'search' ? 'active' : ''}" onclick="setTab('search')"><span>🔍</span>Search</button>
+      <button class="${currentTab === 'practice' ? 'active' : ''}" onclick="setTab('practice')"><span>🎯</span>Practice</button>
+      <button class="${currentTab === 'learn' ? 'active' : ''}" onclick="setTab('learn')"><span>📖</span>Learn</button>
+      <button class="${currentTab === 'saved' ? 'active' : ''}" onclick="setTab('saved')"><span>📚</span>Deck</button>
+    `;
+  }
+
+  if (!main) return;
+  if (currentTab === 'home') main.innerHTML = renderHome();
+  else if (currentTab === 'search') main.innerHTML = renderSearch();
+  else if (currentTab === 'practice') main.innerHTML = renderPractice();
+  else if (currentTab === 'learn') main.innerHTML = renderLearn();
+  else if (currentTab === 'saved') main.innerHTML = renderSaved();
+  else if (currentTab === 'set') main.innerHTML = renderSettings();
 }
+
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-go]');
+  if (btn) setTab(btn.dataset.go);
+});
 
 document.addEventListener('DOMContentLoaded', () => {
-  applyTheme();
-  updateSavedCount();
+  render();
 });
